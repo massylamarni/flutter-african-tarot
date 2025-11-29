@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tarot_africain/models/game.dart';
-import 'package:tarot_africain/models/player.dart';
-import 'package:tarot_africain/models/card.dart' as card;
-import 'package:tarot_africain/widgets/card_pack_widget.dart';
-import 'dart:math';
-
-import 'package:tarot_africain/widgets/card_widget.dart';
-import 'package:tarot_africain/widgets/spread_card_pack_widget.dart';
+import 'package:tarot_africain/widgets/board_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,40 +28,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Game game = Game([]);
-  card.Card? selectedCard;
-  Alignment selectedCardAlignment = Alignment.center;
-  final double cardAspectRatio = 250 / 481;
-  bool cardInCenter = false;
-
-  @override
-  void initState() {
-    super.initState();
-    game = Game([
-      Player("Player 1", PlayerPosition.left),
-      Player("Player 2", PlayerPosition.top),
-      Player("Player 3", PlayerPosition.right),
-      Player("Player 4", PlayerPosition.bottom)
-    ]);
-
-    game.startGame();
-  }
-
-
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     final double appBarHeight = kToolbarHeight; // default AppBar height
     final double footerHeight = kToolbarHeight;
-    final double boardSize = min(
-      screenSize.width,
-      screenSize.height - appBarHeight - footerHeight,
-    );
-    final double cardHeight = boardSize * 1 / 4;
-    final double cardWidth = cardHeight * cardAspectRatio;
-    final players = game.players;
-
-    final double margins = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -78,111 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Center(
-            child: SizedBox(
-              width: boardSize,
-              height: boardSize,
-              child: Row(
-                children: [
-                  Expanded(
-                    // Left
-                    flex: 1,
-                    child: SpreadCardPackWidget(
-                      player: players[0],
-                      height: cardWidth,
-                      width: cardHeight,
-                      onTap: () {
-                        setState(() {
-                          selectedCard = players[0].deck.peek();
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    // Middle
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          // Top
-                          flex: 1,
-                          child: SpreadCardPackWidget(
-                            player: players[1],
-                            height: cardHeight,
-                            width: cardWidth,
-                            onTap: () {
-                              setState(() {
-                                selectedCard = players[1].deck.peek();
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          // Center
-                          flex: 2,
-                          child: Stack(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.all(margins),
-                                color: Colors.green.shade300
-                              ),
-                              AnimatedPositioned(
-                                duration: Duration(milliseconds: 500),
-                                curve: Curves.easeInOut,
-                                top: cardInCenter ? 50 : 0,
-                                bottom: cardInCenter ? null : 0,
-                                left: cardInCenter ? 0 : null,
-                                right: cardInCenter ? 0 : null,
-                                child: CardWidget(
-                                  player: players[1],
-                                  width: cardWidth,
-                                  height: cardHeight,
-                                  onTap: () {
-                                    setState(() {
-                                      cardInCenter = !cardInCenter;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          // Bottom
-                          flex: 1,
-                          child: SpreadCardPackWidget(
-                            player: players[3],
-                            height: cardHeight,
-                            width: cardWidth,
-                            onTap: () {
-                              setState(() {
-                                selectedCard = players[3].deck.peek();
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    // Right
-                    flex: 1,
-                    child: SpreadCardPackWidget(
-                      player: players[2],
-                      height: cardWidth,
-                      width: cardHeight,
-                      onTap: () {
-                        setState(() {
-                          selectedCard = players[2].deck.peek();
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
 
+          BoardWidget(
+            appBarHeight: appBarHeight,
+            footerHeight: footerHeight,
+          ),
+          
           Container(
             height: kToolbarHeight,
             width: double.infinity,
