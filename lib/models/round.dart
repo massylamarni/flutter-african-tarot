@@ -12,7 +12,6 @@ class Round {
   Round(this.players);
 
   void distributeCards(CardPack cardPack, int nbCards) {
-    cardPack.shuffle();
     for (int i = 0; i < nbCards; i++) {
       for (var player in players) {
         if (cardPack.isEmpty) continue;
@@ -58,7 +57,6 @@ class Round {
   }
 
   void nextRound() {
-    centerCards = [];
     roundNumber++;
   }
 

@@ -26,6 +26,18 @@ class CardPack {
     return CardPack(cards);
   }
 
+  factory CardPack.playable() {
+    List<Card> cards = [];
+
+    for (int value = 1; value <= 21; value++) {
+      cards.add(Card(CardType.trumps, value));
+    }
+
+    cards.add(Card(CardType.excuse, 0));
+
+    return CardPack(cards);
+  }
+
   factory CardPack.spades() {
     List<Card> cards = [];
 
@@ -74,6 +86,11 @@ class CardPack {
     cards.add(card);
   }
 
+  void pickAll(List<Card> centerCards) {
+    cards.addAll(centerCards);
+    centerCards.clear();
+  }
+
   Card take([Card? card]) {
     if (card != null) {
       cards.remove(card);
@@ -84,6 +101,7 @@ class CardPack {
   }
 
   Card peek() {
+    if (cards.isEmpty) throw Exception("Deck is empty");
     return cards.last;
   }
 

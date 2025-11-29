@@ -13,7 +13,7 @@ class Game {
 
   void startGame() {
     // Initial card pack
-    CardPack cardPack = CardPack.full();
+    CardPack cardPack = CardPack.playable();
     cardPack.shuffle();
 
     // Points card packs TODO make players chose which one to take
@@ -63,6 +63,7 @@ class Game {
 
       round.lookForRoundWinner();
 
+      cardPack.pickAll(round.centerCards);
       round.nextRound();
     }
   }
