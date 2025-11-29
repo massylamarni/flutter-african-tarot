@@ -7,6 +7,7 @@ class Player {
   final String name;
   final PlayerPosition position;
   CardPack deck = CardPack([]);
+  CardPack pointDeck = CardPack([]);
   int tricksBid = 0;
   int tricksWon = 0;
   int points = 14;

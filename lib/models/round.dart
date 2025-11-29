@@ -12,7 +12,7 @@ class Round {
   Round(this.players);
 
   void distributeCards(CardPack cardPack, int nbCards) {
-    for (int i = 0; i < nbCards; i++) {
+    for (int i = 0; i <= nbCards; i++) {
       for (var player in players) {
         if (cardPack.isEmpty) continue;
         player.receiveCard(cardPack.take());
@@ -58,6 +58,10 @@ class Round {
 
   void nextRound() {
     roundNumber++;
+  }
+
+  int get distributedCardCount {
+    return roundCount - roundNumber;
   }
 
   int _compareCards(Card a, Card b) {

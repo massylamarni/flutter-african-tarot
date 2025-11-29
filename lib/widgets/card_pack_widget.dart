@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tarot_africain/models/card_pack.dart';
 import 'package:tarot_africain/models/player.dart';
 import 'package:tarot_africain/widgets/card_widget.dart';
 
 class CardPackWidget extends StatelessWidget {
   final Player player;
+  final CardPack? cardPack;
   final VoidCallback? onTap;
   final double cardWidth;
   final double cardHeight;
@@ -12,6 +14,7 @@ class CardPackWidget extends StatelessWidget {
   const CardPackWidget({
     super.key,
     required this.player,
+    this.cardPack,
     this.onTap,
     required this.cardWidth,
     required this.cardHeight,
@@ -24,8 +27,9 @@ class CardPackWidget extends StatelessWidget {
     final double adaptedWidth = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double adaptedHeight = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double maxOffsetSize = (cardCount - 1) * offset;
+    final CardPack playerCardPack = cardPack ?? player.deck;
 
-    Widget cardPack = Stack(
+    Widget cardPackWidget = Stack(
         clipBehavior: Clip.none,
         children: [
           for (int i = 0; i < cardCount; i++)
@@ -34,6 +38,7 @@ class CardPackWidget extends StatelessWidget {
               left: i * offset,
               child: CardWidget(
                 player: player,
+                card: playerCardPack.peek(),
                 cardWidth: adaptedWidth,
                 cardHeight: adaptedHeight,
                 onTap: i == cardCount - 1 ? onTap : null,
@@ -42,14 +47,14 @@ class CardPackWidget extends StatelessWidget {
         ],
     );
 
-    cardPack = Center(
+    cardPackWidget = Center(
       child: SizedBox(
         width: adaptedWidth + maxOffsetSize,
         height: adaptedHeight + maxOffsetSize,
-        child: cardPack
+        child: cardPackWidget
       ),
     );
 
-    return cardPack;
+    return cardPackWidget;
   }
 }

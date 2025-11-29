@@ -5,36 +5,26 @@ import 'dart:math';
 
 class Game {
   List<Player> players;
+  late Round round;
   int dealerIndex = 0;
+  final CardPack initialCardPack = CardPack.playable();
+  // Points card packs TODO make players chose which one to take
+  final CardPack spadesCardpack = CardPack.spades();
+  final CardPack heartsCardpack = CardPack.hearts();
+  final CardPack diamondsCardpack = CardPack.diamonds();
+  final CardPack clubsCardpack = CardPack.clubs();
 
   Random rng = Random();
 
   Game(this.players);
 
   void startGame() {
-    // Initial card pack
-    CardPack cardPack = CardPack.playable();
-    cardPack.shuffle();
-
-    // Points card packs TODO make players chose which one to take
-    List<CardPack> pointCardPacks = [
-      CardPack.spades(),
-      CardPack.hearts(),
-      CardPack.diamonds(),
-      CardPack.clubs()
-    ];
-
-    // Decide who is the dealder TODO choose who is the dealer, lasts 5 rounds then gives role to left player.
-    dealerIndex = 0;
-
-    // Init rounds
-    Round round = Round(players);
-
     while (round.roundNumber != round.roundCount) {
       // Distribute cards to players
       for (int roundCardCount = round.roundCount - round.roundNumber; roundCardCount >= 1; roundCardCount--) {
-        round.distributeCards(cardPack, roundCardCount);
+        round.distributeCards(initialCardPack, roundCardCount);
       }
+
 
       // Each player bids, clockwise, dealer is last to bid
       int announcementsSum = 0;
@@ -63,7 +53,7 @@ class Game {
 
       round.lookForRoundWinner();
 
-      cardPack.pickAll(round.centerCards);
+      initialCardPack.pickAll(round.centerCards);
       round.nextRound();
     }
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tarot_africain/models/player.dart';
+import 'package:tarot_africain/models/card.dart' as cardModel;
 
 class CardWidget extends StatelessWidget {
   final Player player;
+  final cardModel.Card? card;
   final VoidCallback? onTap;
   final double? cardWidth;
   final double? cardHeight;
@@ -11,6 +13,7 @@ class CardWidget extends StatelessWidget {
   const CardWidget({
     super.key,
     required this.player,
+    this.card,
     this.onTap,
     this.cardWidth,
     this.cardHeight,
@@ -19,25 +22,28 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = Image.asset(
-      player.deck.peek().assetPath, fit: BoxFit.contain
+    final cardModel.Card playerCard = card ?? player.deck.peek();
+
+    Widget cardWidget = Image.asset(
+      playerCard.assetPath,
+      fit: BoxFit.contain
     );
 
     if (disableRotation == null) {
-      card = RotatedBox(
+      cardWidget = RotatedBox(
         quarterTurns: player.mapPlayerPosition,
-        child: card,
+        child: cardWidget,
       );
     }
 
     if (cardWidth != null || cardHeight != null) {
-      card = SizedBox(width: cardWidth, height: cardHeight, child: card);
+      cardWidget = SizedBox(width: cardWidth, height: cardHeight, child: cardWidget);
     }
 
     if (onTap != null) {
-      card = GestureDetector(onTap: onTap, child: card);
+      cardWidget = GestureDetector(onTap: onTap, child: cardWidget);
     }
 
-    return card;
+    return cardWidget;
   }
 }

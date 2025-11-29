@@ -25,7 +25,7 @@ class SpreadCardPackWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int cardCount = 5;
+    final int cardCount = player.deck.cards.length;
     final double adaptedWidth = (player.hasVerticalPosition ? cardHeight : cardHeight);
     final double adaptedHeight = (player.hasVerticalPosition ? cardHeight : cardHeight);
   
@@ -40,8 +40,8 @@ class SpreadCardPackWidget extends StatelessWidget {
       switch (player.position) {
         case PlayerPosition.bottom: return arc;
         case PlayerPosition.top: return arc + pi;
-        case PlayerPosition.left: return arc - pi/2;
-        case PlayerPosition.right: return arc + pi/2;
+        case PlayerPosition.right: return arc - pi/2;
+        case PlayerPosition.left: return arc + pi/2;
       }
     }
 
@@ -58,7 +58,7 @@ class SpreadCardPackWidget extends StatelessWidget {
       }
     }
 
-    Widget spreadCardPack = SizedBox(
+    Widget spreadCardPackWidget = SizedBox(
       width: adaptedWidth,
       height: adaptedHeight,
       child: Stack(
@@ -71,6 +71,7 @@ class SpreadCardPackWidget extends StatelessWidget {
                 angle: getRotationAngle(i),
                 child: CardWidget(
                   player: player,
+                  card: player.deck.cards[i],
                   cardWidth: adaptedWidth,
                   cardHeight: adaptedHeight,
                   disableRotation: true,
@@ -82,6 +83,6 @@ class SpreadCardPackWidget extends StatelessWidget {
       ),
     );
 
-    return spreadCardPack;
+    return spreadCardPackWidget;
   }
 }

@@ -3,7 +3,7 @@ import 'package:tarot_africain/models/game.dart';
 
 enum GamePhase {
   initGame,
-  choosePointCardPack,
+  distributePointCardPack,
   placeBids,
   placeCards,
   endOfRound,
@@ -20,12 +20,17 @@ class GameController extends ChangeNotifier {
     nextPhase();
   }
 
+  void startDistributePointCardPackSequence() async {
+    await Future.delayed(Duration(seconds: 2));
+    nextPhase();
+  }
+
   void nextPhase() {
     switch(currentPhase) {
       case GamePhase.initGame:
-        currentPhase = GamePhase.choosePointCardPack;
+        currentPhase = GamePhase.distributePointCardPack;
         break;
-      case GamePhase.choosePointCardPack:
+      case GamePhase.distributePointCardPack:
         currentPhase = GamePhase.placeBids;
         break;
       case GamePhase.placeBids:
