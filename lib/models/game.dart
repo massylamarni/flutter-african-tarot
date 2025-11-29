@@ -32,7 +32,7 @@ class Game {
 
     while (round.roundNumber != round.roundCount) {
       // Distribute cards to players
-      for (int roundCardCount = round.roundCount; roundCardCount >= 1; roundCardCount--) {
+      for (int roundCardCount = round.roundCount - round.roundNumber; roundCardCount >= 1; roundCardCount--) {
         round.distributeCards(cardPack, roundCardCount);
       }
 
@@ -45,18 +45,21 @@ class Game {
         players[playerIndex].announceTrick(announcement);
       }
 
-      // Each player plays a card
-      for (var player in players) {
-        round.placeCard(player);
+      // Cards are played until the pack is empty
+      for (int roundCardCount = round.roundCount - round.roundNumber; roundCardCount >= 1; roundCardCount--) {
+        // Each player plays a card
+        for (var player in players) {
+          round.placeCard(player);
+        }
+
+        // Get trick winner
+        print("Le gagnant du pli est: ${round.lookForTrickWinner().name}");
+
+        // TODO trick winner starts next round
+        dealerIndex = (dealerIndex + 1) % players.length;
+
+        // TODO an excuse lets the player chose any value
       }
-
-      // Get trick winner
-      print("Le gagnant du pli est: ${round.lookForTrickWinner().name}");
-
-      // TODO trick winner starts next round
-      dealerIndex = (dealerIndex + 1) % players.length;
-
-      // TODO an excuse lets the player chose any value
 
       round.lookForRoundWinner();
 

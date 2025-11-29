@@ -5,8 +5,8 @@ import './card.dart';
 
 class Round {
   final List<Player> players;
-  final List<Card> centerCards = [];
   final int roundCount = 5;
+  List<Card> centerCards = [];
   int roundNumber = 1;
 
   Round(this.players);
@@ -28,26 +28,29 @@ class Round {
 
   Player lookForTrickWinner() {
     Card maxCard = centerCards[0];
-    int winnerIndex = 0;
+    Player winner = players[0];
 
     for (int i = 1; i < centerCards.length; i++) {
       if (_compareCards(centerCards[i], maxCard) > 0) {
         maxCard = centerCards[i];
-        winnerIndex = i;
       }
     }
 
-    players[winnerIndex].tricksWon++;
-    return players[winnerIndex];
+    for (Player player in players) {
+      if (player.deck.cards.contains(maxCard)) winner = player;
+    }
+
+    winner.tricksWon++;
+    return winner;
   }
 
   Player lookForRoundWinner() {
     Player winner = players[0];
 
-    for (var p in players) {
-      p.updatePoints();
-      if (p.points > winner.points) {
-        winner = p;
+    for (var player in players) {
+      player.updatePoints();
+      if (player.points > winner.points) {
+        winner = player;
       }
     }
     print("Le gagnant du round est: ${winner.name}");
@@ -55,6 +58,7 @@ class Round {
   }
 
   void nextRound() {
+    centerCards = [];
     roundNumber++;
   }
 
