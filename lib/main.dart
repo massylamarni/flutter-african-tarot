@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tarot_africain/models/game.dart';
 import 'package:tarot_africain/models/player.dart';
 import 'package:tarot_africain/models/card.dart' as card;
+import 'package:tarot_africain/widgets/card_pack_widget.dart';
 import 'dart:math';
 
 import 'package:tarot_africain/widgets/card_widget.dart';
@@ -66,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final double cardWidth = cardHeight * cardAspectRatio;
     final players = game.players;
 
+    final double margins = 20;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -83,8 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Left
                     flex: 1,
-                    child: CardWidget(
+                    child: CardPackWidget(
                       player: players[0],
+                      height: cardWidth,
+                      width: cardHeight,
                       onTap: () {
                         setState(() {
                           selectedCard = players[0].deck.peek();
@@ -100,8 +105,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Top
                           flex: 1,
-                          child: CardWidget(
+                          child: CardPackWidget(
                             player: players[1],
+                            height: cardHeight,
+                            width: cardWidth,
                             onTap: () {
                               setState(() {
                                 selectedCard = players[1].deck.peek();
@@ -114,7 +121,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           flex: 2,
                           child: Stack(
                             children: [
-                              Container(color: Colors.green.shade300),
+                              Container(
+                                margin: EdgeInsets.all(margins),
+                                color: Colors.green.shade300
+                              ),
                               AnimatedPositioned(
                                 duration: Duration(milliseconds: 500),
                                 curve: Curves.easeInOut,
@@ -139,8 +149,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Bottom
                           flex: 1,
-                          child: CardWidget(
+                          child: CardPackWidget(
                             player: players[3],
+                            height: cardHeight,
+                            width: cardWidth,
                             onTap: () {
                               setState(() {
                                 selectedCard = players[3].deck.peek();
@@ -154,8 +166,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Right
                     flex: 1,
-                    child: CardWidget(
+                    child: CardPackWidget(
                       player: players[2],
+                      height: cardWidth,
+                      width: cardHeight,
                       onTap: () {
                         setState(() {
                           selectedCard = players[2].deck.peek();

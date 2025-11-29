@@ -9,7 +9,10 @@ class CardPack {
     List<Card> cards = [];
 
     for (var cardType in [CardType.spades, CardType.hearts, CardType.diamonds, CardType.clubs]) {
-      for (int value = 1; value <= 14; value++) {
+      for (int value = 1; value <= 10; value++) {
+        cards.add(Card(cardType, value));
+      }
+      for (int value = 22; value <= 25; value++) {
         cards.add(Card(cardType, value));
       }
     }

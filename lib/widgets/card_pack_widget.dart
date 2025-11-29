@@ -5,40 +5,47 @@ import 'package:tarot_africain/widgets/card_widget.dart';
 class CardPackWidget extends StatelessWidget {
   final Player player;
   final VoidCallback? onTap;
-  final double? width;
-  final double? height;
+  final double width;
+  final double height;
   final double offset;
 
   const CardPackWidget({
     super.key,
     required this.player,
     this.onTap,
-    this.width,
-    this.height,
-    this.offset = 6.0,
+    required this.width,
+    required this.height,
+    this.offset = 2.0,
   });
 
   @override
   Widget build(BuildContext context) {
+    final int cardCount = player.deck.cards.length;
+    final double maxOffsetSize = (cardCount - 1) * offset;
     Widget cardPack = Stack(
+        clipBehavior: Clip.none,
         children: [
-          for (int i = 0; i < player.deck.cards.length; i++)
+          for (int i = 0; i < cardCount; i++)
             Positioned(
               top: i * offset,
               left: i * offset,
               child: CardWidget(
                 player: player,
-                width: width,
-                height: height,
-                onTap: i == player.deck.cards.length - 1 ? onTap : null,
+                width: player.hasVerticalPosition ? width : height,
+                height: player.hasVerticalPosition ? width : height,
+                onTap: i == cardCount - 1 ? onTap : null,
               ),
             )
         ],
     );
 
-    if (width != null || height != null) {
-      cardPack = SizedBox(width: width, height: height, child: cardPack);
-    }
+    cardPack = Center(
+      child: SizedBox(
+        width: width + maxOffsetSize,
+        height: height + maxOffsetSize,
+        child: cardPack
+      ),
+    );
 
     return cardPack;
   }

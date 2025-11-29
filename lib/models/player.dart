@@ -5,13 +5,13 @@ enum PlayerPosition { left, top, right, bottom }
 
 class Player {
   final String name;
-  final PlayerPosition playerPosition;
+  final PlayerPosition position;
   CardPack deck = CardPack([]);
   int tricksBid = 0;
   int tricksWon = 0;
   int points = 14;
 
-  Player(this.name, this.playerPosition);
+  Player(this.name, this.position);
 
   void receiveCard(Card card) {
     deck.add(card);
@@ -32,10 +32,14 @@ class Player {
   }
 
   int get mapPlayerPosition {
-    if (playerPosition == PlayerPosition.left) return 1;
-    if (playerPosition == PlayerPosition.top) return 2;
-    if (playerPosition == PlayerPosition.right) return 3;
+    if (position == PlayerPosition.left) return 1;
+    if (position == PlayerPosition.top) return 2;
+    if (position == PlayerPosition.right) return 3;
     return 0;
+  }
+
+  bool get hasVerticalPosition {
+    return position == PlayerPosition.top || position == PlayerPosition.bottom;
   }
 
   @override
