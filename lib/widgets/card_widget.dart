@@ -4,16 +4,16 @@ import 'package:tarot_africain/models/player.dart';
 class CardWidget extends StatelessWidget {
   final Player player;
   final VoidCallback? onTap;
-  final double? width;
-  final double? height;
+  final double? cardWidth;
+  final double? cardHeight;
   final bool? disableRotation;
 
   const CardWidget({
     super.key,
     required this.player,
     this.onTap,
-    this.width,
-    this.height,
+    this.cardWidth,
+    this.cardHeight,
     this.disableRotation,
   });
 
@@ -30,8 +30,8 @@ class CardWidget extends StatelessWidget {
       );
     }
 
-    if (width != null || height != null) {
-      card = SizedBox(width: width, height: height, child: card);
+    if (cardWidth != null || cardHeight != null) {
+      card = SizedBox(width: cardWidth, height: cardHeight, child: card);
     }
 
     if (onTap != null) {

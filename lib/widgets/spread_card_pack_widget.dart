@@ -8,16 +8,16 @@ const int hotFix0 = 80; // Magic number that fixes card pack position
 class SpreadCardPackWidget extends StatelessWidget {
   final Player player;
   final VoidCallback? onTap;
-  final double width;
-  final double height;
+  final double cardWidth;
+  final double cardHeight;
   final double radius;
   final double angleDelta; // spacing between cards in degrees
 
   const SpreadCardPackWidget({
     super.key,
     required this.player,
-    required this.width,
-    required this.height,
+    required this.cardWidth,
+    required this.cardHeight,
     this.onTap,
     this.radius = 80,
     this.angleDelta = 12,
@@ -26,8 +26,8 @@ class SpreadCardPackWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int cardCount = 5;
-    final double adaptedWidth = (player.hasVerticalPosition ? height : width);
-    final double adaptedHeight = (player.hasVerticalPosition ? height : width);
+    final double adaptedWidth = (player.hasVerticalPosition ? cardHeight : cardHeight);
+    final double adaptedHeight = (player.hasVerticalPosition ? cardHeight : cardHeight);
   
     double getArcAngle(int index) {
       final double startAngle = -1 * (cardCount - 1) * angleDelta / 2; // Middle card angle is 0°, others spread around it
@@ -71,8 +71,8 @@ class SpreadCardPackWidget extends StatelessWidget {
                 angle: getRotationAngle(i),
                 child: CardWidget(
                   player: player,
-                  width: adaptedWidth,
-                  height: adaptedHeight,
+                  cardWidth: adaptedWidth,
+                  cardHeight: adaptedHeight,
                   disableRotation: true,
                   onTap: i == cardCount - 1 ? onTap : null,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tarot_africain/models/card_pack.dart';
 import 'dart:math';
 import 'package:tarot_africain/models/game.dart';
 import 'package:tarot_africain/models/player.dart';
@@ -43,13 +44,14 @@ class _BoardWidgetState extends State<BoardWidget> {
 
     controller.game.startGame();
     controller.addListener(_onPhaseChanged);
+    controller.startInitGameSequence();
   }
 
   void _onPhaseChanged() {
     setState(() {
       switch(controller.currentPhase) {
         case GamePhase.choosePointCardPack:
-          null;
+          controller.startInitGameSequence();
           break;
         case GamePhase.placeBids:
           null;
@@ -83,90 +85,141 @@ class _BoardWidgetState extends State<BoardWidget> {
     final double cardWidth = cardHeight * cardAspectRatio;
     final double margins = 0;
     final List<Player> players = controller.game.players;
+    Player voidPlayer = Player("VOID_PLAYER", PlayerPosition.bottom);
+    Player heartsPlayer = Player("HEARTS_PLAYER", PlayerPosition.bottom);
+    Player spadesPlayer = Player("SPADES_PLAYER", PlayerPosition.bottom);
+    Player clubsPlayer = Player("CLUBS_PLAYER", PlayerPosition.bottom);
+    Player diamondsPlayer = Player("DIAMONS_PLAYER", PlayerPosition.bottom);
+    voidPlayer.deck = CardPack.playable();
+    heartsPlayer.deck = CardPack.hearts();
+    spadesPlayer.deck = CardPack.spades();
+    clubsPlayer.deck = CardPack.clubs();
+    diamondsPlayer.deck = CardPack.diamonds();
 
-    Widget _leftPlayerArea() {
-      Widget widget = SpreadCardPackWidget(
-        player: players[0],
-        height: cardWidth,
-        width: cardHeight,
-        onTap: () {
-          setState(() {
-            selectedCard = players[0].deck.peek();
-          });
-        },
-      );
+    Widget _sharedPlayerArea(int index) {
+      Widget widget;
+      if (controller.currentPhase == GamePhase.initGame) {
+        return Container();
+      } else if (controller.currentPhase == GamePhase.choosePointCardPack) {
+        return Container();
+      } else {
+        widget = SpreadCardPackWidget(
+          player: players[index],
+          cardHeight: cardHeight,
+          cardWidth: cardWidth,
+          onTap: () {
+            setState(() {
+              selectedCard = players[index].deck.peek();
+            });
+          },
+        );
+      }
+      
       return widget;
+    }
+
+    Widget _leftPlayerArea() {      
+      return _sharedPlayerArea(0);
     }
 
     Widget _topPlayerArea() {
-      Widget widget = SpreadCardPackWidget(
-        player: players[1],
-        height: cardHeight,
-        width: cardWidth,
-        onTap: () {
-          setState(() {
-            selectedCard = players[1].deck.peek();
-          });
-        },
-      );
-      return widget;
-    }
-
-    Widget _bottomPlayerArea() {
-      Widget widget = SpreadCardPackWidget(
-        player: players[3],
-        height: cardHeight,
-        width: cardWidth,
-        onTap: () {
-          setState(() {
-            selectedCard = players[3].deck.peek();
-          });
-        },
-      );
-      return widget;
+      return _sharedPlayerArea(1);
     }
 
     Widget _rightPlayerArea() {
-      Widget widget = SpreadCardPackWidget(
-        player: players[2],
-        height: cardWidth,
-        width: cardHeight,
-        onTap: () {
-          setState(() {
-            selectedCard = players[2].deck.peek();
-          });
-        },
-      );
-      return widget;
+      return _sharedPlayerArea(2);
+    }
+
+    Widget _bottomPlayerArea() {
+      return _sharedPlayerArea(3);
     }
 
     Widget _boardCenter() {
-      Widget widget = Stack(
-        children: [
-          Container(
-            margin: EdgeInsets.all(margins),
-            color: Colors.green.shade300,
-          ),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            top: cardInCenter ? 50 : 0,
-            bottom: cardInCenter ? null : 0,
-            left: cardInCenter ? 0 : null,
-            right: cardInCenter ? 0 : null,
-            child: CardWidget(
-              player: players[1],
-              width: cardWidth,
-              height: cardHeight,
-              onTap: () {
-                setState(() {
-                  cardInCenter = !cardInCenter;
-                });
-              },
+      Widget widget;
+      if (controller.currentPhase == GamePhase.initGame) {
+        widget = AnimatedPositioned(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          top: 50,
+          left: 0,
+          right: 0,
+          child: CardPackWidget(
+            player: voidPlayer,
+            cardWidth: cardWidth,
+            cardHeight: cardHeight
+          )
+        );
+      } else if (controller.currentPhase == GamePhase.choosePointCardPack) {
+        double spacing = -30;
+        widget = Stack(
+          clipBehavior: Clip.none,
+          children: [
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              top: spacing,
+              left: spacing,
+              child: CardPackWidget(
+                player: heartsPlayer,
+                cardWidth: cardWidth,
+                cardHeight: cardHeight
+              )
             ),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              top: spacing,
+              right: spacing,
+              child: CardPackWidget(
+                player: spadesPlayer,
+                cardWidth: cardWidth,
+                cardHeight: cardHeight
+              )
+            ),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              bottom: spacing,
+              left: spacing,
+              child: CardPackWidget(
+                player: clubsPlayer,
+                cardWidth: cardWidth,
+                cardHeight: cardHeight
+              )
+            ),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              bottom: spacing,
+              right: spacing,
+              child: CardPackWidget(
+                player: diamondsPlayer,
+                cardWidth: cardWidth,
+                cardHeight: cardHeight
+              )
+            )
+          ],
+        );
+      } else {
+        widget = AnimatedPositioned(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          top: cardInCenter ? 50 : 0,
+          bottom: cardInCenter ? null : 0,
+          left: cardInCenter ? 0 : null,
+          right: cardInCenter ? 0 : null,
+          child: CardWidget(
+            player: players[1],
+            cardWidth: cardWidth,
+            cardHeight: cardHeight,
+            onTap: () {
+              setState(() {
+                cardInCenter = !cardInCenter;
+              });
+            },
           ),
-        ],
-      );
+        );
+      }
       return widget;
     }
 
@@ -182,7 +235,18 @@ class _BoardWidgetState extends State<BoardWidget> {
               child: Column(
                 children: [
                   Expanded(flex: 1, child: _topPlayerArea()),
-                  Expanded(flex: 2, child: _boardCenter()),
+                  Expanded(
+                    flex: 2,
+                    child: Stack(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(margins),
+                          color: Colors.green.shade300,
+                        ),
+                        _boardCenter()
+                      ]
+                    )
+                  ),
                   Expanded(flex: 1, child:  _bottomPlayerArea()),
                 ],
               ),

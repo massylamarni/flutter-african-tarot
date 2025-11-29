@@ -41,7 +41,10 @@ class CardPack {
   factory CardPack.spades() {
     List<Card> cards = [];
 
-    for (int value = 1; value <= 14; value++) {
+    for (int value = 1; value <= 10; value++) {
+      cards.add(Card(CardType.spades, value));
+    }
+    for (int value = 22; value <= 25; value++) {
       cards.add(Card(CardType.spades, value));
     }
 
@@ -51,7 +54,10 @@ class CardPack {
   factory CardPack.hearts() {
     List<Card> cards = [];
 
-    for (int value = 1; value <= 14; value++) {
+    for (int value = 1; value <= 10; value++) {
+      cards.add(Card(CardType.hearts, value));
+    }
+    for (int value = 22; value <= 25; value++) {
       cards.add(Card(CardType.hearts, value));
     }
 
@@ -61,7 +67,10 @@ class CardPack {
   factory CardPack.diamonds() {
     List<Card> cards = [];
 
-    for (int value = 1; value <= 14; value++) {
+    for (int value = 1; value <= 10; value++) {
+      cards.add(Card(CardType.diamonds, value));
+    }
+    for (int value = 22; value <= 25; value++) {
       cards.add(Card(CardType.diamonds, value));
     }
 
@@ -71,7 +80,10 @@ class CardPack {
   factory CardPack.clubs() {
     List<Card> cards = [];
 
-    for (int value = 1; value <= 14; value++) {
+    for (int value = 1; value <= 10; value++) {
+      cards.add(Card(CardType.clubs, value));
+    }
+    for (int value = 22; value <= 25; value++) {
       cards.add(Card(CardType.clubs, value));
     }
 

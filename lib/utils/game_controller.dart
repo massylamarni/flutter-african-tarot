@@ -15,6 +15,11 @@ class GameController extends ChangeNotifier {
 
   GameController(this.game);
 
+  void startInitGameSequence() async {
+    await Future.delayed(Duration(seconds: 2));
+    nextPhase();
+  }
+
   void nextPhase() {
     switch(currentPhase) {
       case GamePhase.initGame:
