@@ -21,7 +21,10 @@ class CardPackWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int cardCount = player.deck.cards.length;
+    final double adaptedWidth = player.hasVerticalPosition ? height : width;
+    final double adaptedHeight = player.hasVerticalPosition ? height : width;
     final double maxOffsetSize = (cardCount - 1) * offset;
+
     Widget cardPack = Stack(
         clipBehavior: Clip.none,
         children: [
@@ -31,8 +34,8 @@ class CardPackWidget extends StatelessWidget {
               left: i * offset,
               child: CardWidget(
                 player: player,
-                width: player.hasVerticalPosition ? width : height,
-                height: player.hasVerticalPosition ? width : height,
+                width: adaptedWidth,
+                height: adaptedHeight,
                 onTap: i == cardCount - 1 ? onTap : null,
               ),
             )
@@ -41,8 +44,8 @@ class CardPackWidget extends StatelessWidget {
 
     cardPack = Center(
       child: SizedBox(
-        width: width + maxOffsetSize,
-        height: height + maxOffsetSize,
+        width: adaptedWidth + maxOffsetSize,
+        height: adaptedHeight + maxOffsetSize,
         child: cardPack
       ),
     );

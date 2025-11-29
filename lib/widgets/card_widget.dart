@@ -6,6 +6,7 @@ class CardWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final double? width;
   final double? height;
+  final bool? disableRotation;
 
   const CardWidget({
     super.key,
@@ -13,14 +14,21 @@ class CardWidget extends StatelessWidget {
     this.onTap,
     this.width,
     this.height,
+    this.disableRotation,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget card = RotatedBox(
-      quarterTurns: player.mapPlayerPosition,
-      child: Image.asset(player.deck.peek().assetPath, fit: BoxFit.contain),
+    Widget card = Image.asset(
+      player.deck.peek().assetPath, fit: BoxFit.contain
     );
+
+    if (disableRotation == null) {
+      card = RotatedBox(
+        quarterTurns: player.mapPlayerPosition,
+        child: card,
+      );
+    }
 
     if (width != null || height != null) {
       card = SizedBox(width: width, height: height, child: card);

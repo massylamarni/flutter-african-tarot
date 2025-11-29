@@ -6,6 +6,7 @@ import 'package:tarot_africain/widgets/card_pack_widget.dart';
 import 'dart:math';
 
 import 'package:tarot_africain/widgets/card_widget.dart';
+import 'package:tarot_africain/widgets/spread_card_pack_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final double cardWidth = cardHeight * cardAspectRatio;
     final players = game.players;
 
-    final double margins = 20;
+    final double margins = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Left
                     flex: 1,
-                    child: CardPackWidget(
+                    child: SpreadCardPackWidget(
                       player: players[0],
                       height: cardWidth,
                       width: cardHeight,
@@ -105,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Top
                           flex: 1,
-                          child: CardPackWidget(
+                          child: SpreadCardPackWidget(
                             player: players[1],
                             height: cardHeight,
                             width: cardWidth,
@@ -149,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Bottom
                           flex: 1,
-                          child: CardPackWidget(
+                          child: SpreadCardPackWidget(
                             player: players[3],
                             height: cardHeight,
                             width: cardWidth,
@@ -166,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Right
                     flex: 1,
-                    child: CardPackWidget(
+                    child: SpreadCardPackWidget(
                       player: players[2],
                       height: cardWidth,
                       width: cardHeight,
