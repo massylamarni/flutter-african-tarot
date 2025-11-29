@@ -27,8 +27,8 @@ class Card {
     return '';
   }
 
-  String get cardBack => 'assets/tarot/CaJ-TaroTv1-Dos.png';
-  String get assetPath => 'assets/tarot/CaJ-TaroTv1-${mapCardValue + mapCardType}.png';
+  String get cardBack => 'assets/cards/CaJ-TaroTv1-Dos.png';
+  String get assetPath => 'assets/cards/CaJ-TaroTv1-${mapCardValue + mapCardType}.png';
 
   @override
   String toString() {

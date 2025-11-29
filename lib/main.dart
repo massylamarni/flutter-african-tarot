@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tarot_africain/models/game.dart';
 import 'package:tarot_africain/models/player.dart';
+import 'package:tarot_africain/models/card.dart' as card;
 import 'dart:math';
 
-import './widgets/card_container_widget.dart';
+import 'package:tarot_africain/widgets/card_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Game game = Game([]);
-  String? selectedCardPath;
+  card.Card? selectedCard;
   Alignment selectedCardAlignment = Alignment.center;
   final double cardAspectRatio = 250 / 481;
   bool cardInCenter = false;
@@ -42,10 +43,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     game = Game([
-      Player("Player 1"),
-      Player("Player 2"),
-      Player("Player 3"),
-      Player("Player 4")
+      Player("Player 1", PlayerPosition.left),
+      Player("Player 2", PlayerPosition.top),
+      Player("Player 3", PlayerPosition.right),
+      Player("Player 4", PlayerPosition.bottom)
     ]);
 
     game.startGame();
@@ -63,6 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     final double cardHeight = boardSize * 1 / 4;
     final double cardWidth = cardHeight * cardAspectRatio;
+    final players = game.players;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -80,12 +83,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Left
                     flex: 1,
-                    child: CardContainer(
-                      cardImagePath: 'assets/cards/CaJ-TaroTv1-1AT.png',
-                      quarterTurns: 1,
+                    child: CardWidget(
+                      player: players[0],
                       onTap: () {
                         setState(() {
-                          selectedCardPath = 'assets/cards/CaJ-TaroTv1-1AT.png';
+                          selectedCard = players[0].deck.peek();
                         });
                       },
                     ),
@@ -98,13 +100,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Top
                           flex: 1,
-                          child: CardContainer(
-                            cardImagePath: 'assets/cards/CaJ-TaroTv1-1AT.png',
-                            quarterTurns: 2,
+                          child: CardWidget(
+                            player: players[1],
                             onTap: () {
                               setState(() {
-                                selectedCardPath =
-                                    'assets/cards/CaJ-TaroTv1-1AT.png';
+                                selectedCard = players[1].deck.peek();
                               });
                             },
                           ),
@@ -122,10 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 bottom: cardInCenter ? null : 0,
                                 left: cardInCenter ? 0 : null,
                                 right: cardInCenter ? 0 : null,
-                                child: CardContainer(
-                                  cardImagePath:
-                                      'assets/cards/CaJ-TaroTv1-1AT.png',
-                                  quarterTurns: 2,
+                                child: CardWidget(
+                                  player: players[1],
                                   width: cardWidth,
                                   height: cardHeight,
                                   onTap: () {
@@ -141,13 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           // Bottom
                           flex: 1,
-                          child: CardContainer(
-                            cardImagePath: 'assets/cards/CaJ-TaroTv1-1AT.png',
-                            quarterTurns: 0,
+                          child: CardWidget(
+                            player: players[3],
                             onTap: () {
                               setState(() {
-                                selectedCardPath =
-                                    'assets/cards/CaJ-TaroTv1-1AT.png';
+                                selectedCard = players[3].deck.peek();
                               });
                             },
                           ),
@@ -158,12 +154,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     // Right
                     flex: 1,
-                    child: CardContainer(
-                      cardImagePath: 'assets/cards/CaJ-TaroTv1-1AT.png',
-                      quarterTurns: 3,
+                    child: CardWidget(
+                      player: players[2],
                       onTap: () {
                         setState(() {
-                          selectedCardPath = 'assets/cards/CaJ-TaroTv1-1AT.png';
+                          selectedCard = players[2].deck.peek();
                         });
                       },
                     ),

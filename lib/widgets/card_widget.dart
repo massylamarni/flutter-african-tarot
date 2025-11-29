@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:tarot_africain/models/player.dart';
 
-class CardContainer extends StatelessWidget {
-  final String cardImagePath;
-  final int quarterTurns;
+class CardWidget extends StatelessWidget {
+  final Player player;
   final VoidCallback? onTap;
   final double? width;
   final double? height;
 
-  const CardContainer({
+  const CardWidget({
     super.key,
-    required this.cardImagePath,
-    this.quarterTurns = 0,
+    required this.player,
     this.onTap,
     this.width,
     this.height,
@@ -19,8 +18,8 @@ class CardContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget card = RotatedBox(
-      quarterTurns: quarterTurns,
-      child: Image.asset(cardImagePath, fit: BoxFit.contain),
+      quarterTurns: player.mapPlayerPosition,
+      child: Image.asset(player.deck.peek().assetPath, fit: BoxFit.contain),
     );
 
     if (width != null || height != null) {
