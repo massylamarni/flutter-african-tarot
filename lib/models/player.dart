@@ -60,8 +60,12 @@ class Player {
     tricksBid = value;
   }
 
+  int getTrickPoints() {
+    return (tricksBid - tricksWon).abs();
+  }
+
   void updatePoints() {
-    points = points - (tricksBid - tricksWon).abs();
+    points = points - getTrickPoints();
   }
 
   int get mapPlayerPosition {

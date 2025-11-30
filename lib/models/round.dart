@@ -82,26 +82,42 @@ class Round {
     Player winner = players[0]!;
 
     for (var player in players.values) {
-      player.updatePoints();
-      if (player.points > winner.points) {
+      if (player.getTrickPoints() > winner.getTrickPoints()) {
         winner = player;
       }
+      player.updatePoints();
     }
     print("Le gagnant du round est: ${winner.name}");
     return winner;
   }
 
-  void nextRound() {
+  Player lookForGameWinner() {
+    Player winner = players[0]!;
+
+    for (var player in players.values) {
+      if (player.points > winner.points) {
+        winner = player;
+      }
+      player.updatePoints();
+    }
+    print("Le gagnant du jeu est: ${winner.name}");
+    return winner;
+  }
+
+  bool nextRound(Player winner) {
     for (Player player in players.values) {
-      if (player.points < 0) {
-        for (int i = 0; i < player.points.abs(); i++) {
-          player.deck.take();
+      if (player == winner) continue;
+      if (player.points <= 0) return false;
+      if (player.points < player.pointDeck.cards.length) {
+        for (int i = player.points; i < player.pointDeck.cards.length; i++) {
+          player.pointDeck.take();
         }
       }
       player.tricksWon = 0;
       player.tricksBid = 0;
     }
     roundNumber++;
+    return true;
   }
 
   int get distributedCardCount {

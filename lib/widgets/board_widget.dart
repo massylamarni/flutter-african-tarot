@@ -30,7 +30,7 @@ class BoardWidget extends StatefulWidget {
 
 class _BoardWidgetState extends State<BoardWidget> {
   GameController controller = GameController(Game({}));
-  Player mainPlayer = Player(0, "Main player", PlayerPosition.bottom);
+  Player mainPlayer = Player(0, "You", PlayerPosition.bottom);
   Map<int, card_model.Card> selectedCards = {};
   Alignment selectedCardAlignment = Alignment.center;
 
@@ -67,8 +67,6 @@ class _BoardWidgetState extends State<BoardWidget> {
           break;
         case GamePhase.endOfGame:
           break;
-        default:
-          break;
       }
     });
   }
@@ -89,7 +87,7 @@ class _BoardWidgetState extends State<BoardWidget> {
     final double cardHeight = boardSize * 1 / 4;
     final double cardWidth = cardHeight * cardAspectRatio;
     final double margins = 0;
-    final Map<int, Player> players = controller.game.players;
+    Map<int, Player> players = controller.game.players;
     Player voidPlayer = Player.voidPlayer();
     Player heartsPlayer = Player.heartsPlayer();
     Player spadesPlayer = Player.spadesPlayer();
@@ -107,6 +105,26 @@ class _BoardWidgetState extends State<BoardWidget> {
 
     /* INIT GAME */
     if (controller.currentPhase == GamePhase.initGame) {
+      controller.game = Game({
+        0: Player(0, "You", PlayerPosition.bottom),
+        1: Player(1, "Player 1", PlayerPosition.left),
+        2: Player(2, "Player 2", PlayerPosition.top),
+        3: Player(3, "Player 3", PlayerPosition.right),
+      });
+
+      players = controller.game.players;
+
+      voidPlayer = Player.voidPlayer();
+      heartsPlayer = Player.heartsPlayer();
+      spadesPlayer = Player.spadesPlayer();
+      clubsPlayer = Player.clubsPlayer();
+      diamondsPlayer = Player.diamondsPlayer();
+      voidPlayer.deck = controller.game.initialCardPack;
+      heartsPlayer.deck = controller.game.heartsCardpack;
+      spadesPlayer.deck = controller.game.spadesCardpack;
+      clubsPlayer.deck = controller.game.clubsCardpack;
+      diamondsPlayer.deck = controller.game.diamondsCardpack;
+
       // Decide who is the dealder TODO choose who is the dealer, lasts 5 rounds then gives role to left player.
       controller.game.dealerId = players[0]!.id;
       
@@ -162,6 +180,7 @@ class _BoardWidgetState extends State<BoardWidget> {
               bottom: positions[i][3],
               child: CardPackWidget(
                 player: intermediatePlayers[i],
+                cardPack: players[i]!.pointDeck,
                 cardWidth: cardWidth,
                 cardHeight: cardHeight
               )
@@ -265,7 +284,9 @@ class _BoardWidgetState extends State<BoardWidget> {
     else if (controller.currentPhase == GamePhase.getTrickWinner) {
       controller.game.round.lookForTrickWinner();
       if (players[0]!.deck.isEmpty) {
-        controller.nextPhase(true);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.nextPhase(true);
+        });
       } else {
         controller.delaySequence(true);
       }
@@ -319,12 +340,20 @@ class _BoardWidgetState extends State<BoardWidget> {
 
     /* END OF ROUND */
     else if (controller.currentPhase == GamePhase.endOfRound) {
-      controller.game.round.lookForRoundWinner();
+      Player winner = controller.game.round.lookForRoundWinner();
       if (controller.game.round.roundNumber == controller.game.round.roundCount) {
-        controller.nextPhase(true);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.nextPhase(true);
+        });
       } else {
-        controller.game.round.nextRound();
-        controller.delaySequence(true);
+        bool hasNextRound = controller.game.round.nextRound(winner);
+        if (!hasNextRound) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            controller.nextPhase(true);
+          });
+        } else {
+          controller.delaySequence(true);
+        }
       }
       
       // Widgets
@@ -371,6 +400,52 @@ class _BoardWidgetState extends State<BoardWidget> {
             ) : Container(),
           )
         ],
+      );
+    }
+
+    /* END OF GAME */
+    else if (controller.currentPhase == GamePhase.endOfGame) {
+      Player winner = controller.game.round.lookForGameWinner();
+      
+      // Widgets
+      sharedPlayerArea = (i) => i != 0 ? SpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
+      ) : HorizontallySpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
+      );
+
+      sharedPlayerSlot = (i) => CardPackWidget(
+        player: players[i]!,
+        cardPack: players[i]?.pointDeck,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+      );
+
+      List<List<double?>> positions = [
+        [0, null, 0, 50],
+        [50, 0, null, 0],
+        [0, 50, 0, null],
+        [null, 0, 50, 0],
+      ];
+      boardCenter = () => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("${winner.name} won !"),
+            ElevatedButton(
+              child: Text("Restart ?"),
+              onPressed: () => setState(() {
+                controller.nextPhase(false);
+              }),
+            ),
+          ],
+        ),
       );
     }
 
