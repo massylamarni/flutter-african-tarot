@@ -8,6 +8,7 @@ class CardWidget extends StatelessWidget {
   final Function()? onTap;
   final double? cardWidth;
   final double? cardHeight;
+  final bool? hideCard;
   final bool? disableRotation;
   final bool? disableGestureDetector;
 
@@ -18,6 +19,7 @@ class CardWidget extends StatelessWidget {
     this.onTap,
     this.cardWidth,
     this.cardHeight,
+    this.hideCard,
     this.disableRotation,
     this.disableGestureDetector,
   });
@@ -27,7 +29,7 @@ class CardWidget extends StatelessWidget {
     final card_model.Card playerCard = card ?? player.deck.peek();
 
     Widget cardWidget = Image.asset(
-      playerCard.assetPath,
+      hideCard != null && hideCard! ? playerCard.cardBack : playerCard.assetPath,
       fit: BoxFit.contain
     );
 

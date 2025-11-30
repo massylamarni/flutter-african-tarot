@@ -18,7 +18,7 @@ class PlayerWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text("${player.name} ${player.tricksWon.toString()}/${player.tricksBid.toString()}"),
+          Text("${player.name} - (${player.tricksWon.toString()}/${player.tricksBid.toString()})"),
         ],
       )
     );

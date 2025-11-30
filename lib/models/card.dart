@@ -8,6 +8,7 @@ class Card {
   Card(this.cardType, this.cardValue);
 
   String get mapCardValue {
+    if (cardType == CardType.excuse) return 'Exc';
     if (cardValue >= 1 && cardValue <= 21) { // Trumps (Atouts) [1-21], Classic [1-14]
       if (cardType != CardType.trumps && cardValue == 1) return 'A'; // Ace
       return cardValue.toString(); 

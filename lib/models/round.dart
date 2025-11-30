@@ -123,7 +123,11 @@ class Round {
 
   bool nextRound(Player winner) {
     for (Player player in players.values) {
-      if (player == winner) continue;
+      if (player == winner) {
+        player.tricksWon = 0;
+        player.tricksBid = 0;
+        continue;
+      }
       if (player.points <= 0) return false;
       if (player.points < player.pointDeck.cards.length) {
         for (int i = player.points; i < player.pointDeck.cards.length; i++) {

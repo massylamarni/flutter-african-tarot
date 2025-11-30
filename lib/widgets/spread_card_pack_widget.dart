@@ -7,6 +7,7 @@ const int hotFix0 = 80; // Magic number that fixes card pack position
 
 class SpreadCardPackWidget extends StatelessWidget {
   final Player player;
+  final bool showOpponentCards;
   final Function(int)? onTap;
   final double cardWidth;
   final double cardHeight;
@@ -16,6 +17,7 @@ class SpreadCardPackWidget extends StatelessWidget {
   const SpreadCardPackWidget({
     super.key,
     required this.player,
+    required this.showOpponentCards,
     required this.cardWidth,
     required this.cardHeight,
     this.onTap,
@@ -76,6 +78,7 @@ class SpreadCardPackWidget extends StatelessWidget {
                     card: player.deck.cards[i],
                     cardWidth: adaptedWidth,
                     cardHeight: adaptedHeight,
+                    hideCard: !showOpponentCards,
                     disableRotation: true,
                     disableGestureDetector: true,
                   ),

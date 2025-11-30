@@ -1,7 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tarot_africain/models/card_pack.dart';
 import 'package:tarot_africain/models/player.dart';
 import 'package:tarot_africain/widgets/card_widget.dart';
+
+const MAX_CARD_STACK_DISPLAY = 5;
 
 class CardPackWidget extends StatelessWidget {
   final Player player;
@@ -28,14 +31,15 @@ class CardPackWidget extends StatelessWidget {
     final double adaptedWidth = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double adaptedHeight = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double maxOffsetSize = (cardCount - 1) * offset;
+    final int offsetCount = min(MAX_CARD_STACK_DISPLAY, cardCount);
 
     Widget cardPackWidget = Stack(
         clipBehavior: Clip.none,
         children: [
           for (int i = 0; i < cardCount; i++)
             Positioned(
-              top: i * offset,
-              left: i * offset,
+              top: i < offsetCount ? i * offset : offsetCount * offset,
+              left: i < offsetCount ? i * offset : offsetCount * offset,
               child: CardWidget(
                 player: player,
                 card: playerCardPack.peek(),
