@@ -5,6 +5,7 @@ import 'package:tarot_africain/models/player.dart';
 import 'package:tarot_africain/models/card.dart' as card_model;
 import 'package:tarot_africain/models/round.dart';
 import 'package:tarot_africain/utils/game_controller.dart';
+import 'package:tarot_africain/widgets/excuse_selector_widget.dart';
 import 'package:tarot_africain/widgets/horizontally_spread_card_pack_widget.dart';
 import 'package:tarot_africain/widgets/player_widget.dart';
 import 'package:tarot_africain/widgets/trick_selector_widget.dart';
@@ -227,6 +228,31 @@ class _BoardWidgetState extends State<BoardWidget> {
     else if (controller.currentPhase == GamePhase.placeCards) {
       voidPlayer.deck.pickAll(controller.game.round.centerCards);
 
+      Future<int?> showExcuseSelectorPopup(BuildContext context, int currentValue) {
+        return showDialog<int>(
+          context: context,
+          barrierDismissible: true,
+          builder: (dialogContext) {
+            return Dialog(
+              insetPadding: EdgeInsets.all(20),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SizedBox(
+                  width: 250,
+                  height: 300,
+                  child: ExcuseSelectorWidget(
+                    value: currentValue,
+                    onChanged: (v) {
+                      Navigator.of(dialogContext).pop(v);
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }
+
       // Widgets
       sharedPlayerArea = (i) => i != 0 ? SpreadCardPackWidget(
         player: players[i]!,
@@ -238,11 +264,24 @@ class _BoardWidgetState extends State<BoardWidget> {
         cardHeight: cardHeight,
         cardWidth: cardWidth,
         onTap: (cardIndex) {
-          setState(() {
-            selectedCards[i] = players[i]!.playCard(players[i]!.deck.cards[cardIndex]);
-            controller.game.round.placeCards(players[0]!.id);
-            controller.nextPhase(false);
-          });
+          if (players[i]!.deck.cards[cardIndex].cardType == card_model.CardType.excuse) {
+            showExcuseSelectorPopup(context, 1).then((selectedValue) {
+              if (selectedValue == null) return;
+
+              setState(() {
+                players[i]!.deck.cards[cardIndex].cardValue = selectedValue;                 
+                selectedCards[i] = players[i]!.playCard(players[i]!.deck.cards[cardIndex]);
+                controller.game.round.placeCards(players[0]!.id);
+                controller.nextPhase(false);
+              });
+            });
+          } else {
+            setState(() {
+              selectedCards[i] = players[i]!.playCard(players[i]!.deck.cards[cardIndex]);
+              controller.game.round.placeCards(players[0]!.id);
+              controller.nextPhase(false);
+            }); 
+          }
         },
       );
 

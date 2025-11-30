@@ -142,8 +142,12 @@ class Round {
   }
 
   int _compareCards(Card a, Card b) {
-    if (a.cardType == CardType.excuse) return 1; // Excuse wins
-    if (b.cardType == CardType.excuse) return -1;
+    if (a.cardType == CardType.excuse && a.cardValue == 0) {
+      return 1;
+    }
+    if (b.cardType == CardType.excuse && a.cardValue == 0) {
+      return -1;
+    }
     return a.cardValue.compareTo(b.cardValue);
   }
 }

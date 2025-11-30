@@ -2,7 +2,7 @@ enum CardType { spades, hearts, diamonds, clubs, trumps, excuse }
 
 class Card {
   final CardType cardType;
-  final int cardValue;
+  int cardValue;
   int? belongsTo = 0;
 
   Card(this.cardType, this.cardValue);
