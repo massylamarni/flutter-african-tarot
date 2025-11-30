@@ -98,8 +98,8 @@ class CardPack {
     cards.add(card);
   }
 
-  void pickAll(List<Card> centerCards) {
-    cards.addAll(centerCards);
+  void pickAll(Map<int, Card> centerCards) {
+    cards.addAll(centerCards.values);
     centerCards.clear();
   }
 

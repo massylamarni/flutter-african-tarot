@@ -6,7 +6,7 @@ import './card.dart';
 class Round {
   final Map<int, Player> players;
   final int roundCount = 5;
-  List<Card> centerCards = [];
+  Map<int, Card> centerCards = {};
   int roundNumber = 1;
 
   Round(this.players);
@@ -21,17 +21,17 @@ class Round {
   }
 
   void placeCard(Player player) {
-    centerCards.add(player.deck.peek());
+    centerCards[player.id] = player.deck.peek();
     player.playCard(player.deck.peek());
   }
 
   Player lookForTrickWinner() {
-    Card maxCard = centerCards[0];
+    Card maxCard = centerCards[0]!;
     Player winner = players[0]!;
 
     for (int i = 1; i < centerCards.length; i++) {
-      if (_compareCards(centerCards[i], maxCard) > 0) {
-        maxCard = centerCards[i];
+      if (_compareCards(centerCards[i]!, maxCard) > 0) {
+        maxCard = centerCards[i]!;
       }
     }
 

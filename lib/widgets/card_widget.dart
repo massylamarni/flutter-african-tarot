@@ -36,8 +36,10 @@ class CardWidget extends StatelessWidget {
       );
     }
 
-    if (cardWidth != null || cardHeight != null) {
-      cardWidget = SizedBox(width: cardWidth, height: cardHeight, child: cardWidget);
+    if (cardWidth != null && cardHeight != null) {
+      final double adaptedWidth = player.hasVerticalPosition ? cardHeight! : cardHeight!;
+      final double adaptedHeight = player.hasVerticalPosition ? cardHeight! : cardHeight!;
+      cardWidget = SizedBox(width: adaptedWidth, height: adaptedHeight, child: cardWidget);
     }
 
     if (onTap != null) {
