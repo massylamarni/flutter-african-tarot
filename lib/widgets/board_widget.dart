@@ -5,6 +5,7 @@ import 'package:tarot_africain/models/player.dart';
 import 'package:tarot_africain/models/card.dart' as card_model;
 import 'package:tarot_africain/models/round.dart';
 import 'package:tarot_africain/utils/game_controller.dart';
+import 'package:tarot_africain/widgets/horizontally_spread_card_pack_widget.dart';
 import 'package:tarot_africain/widgets/player_widget.dart';
 import 'package:tarot_africain/widgets/trick_selector_widget.dart';
 import './card_pack_widget.dart';
@@ -50,17 +51,21 @@ class _BoardWidgetState extends State<BoardWidget> {
   void _onPhaseChanged() {
     setState(() {
       switch(controller.currentPhase) {
+        case GamePhase.initGame:
+          controller.startInitGameSequence();
+          break;
         case GamePhase.distributePointCardPack:
           controller.startDistributePointCardPackSequence();
           break;
         case GamePhase.placeBids:
-          null;
           break;
         case GamePhase.placeCards:
-          null;
+          break;
+        case GamePhase.getTrickWinner:
           break;
         case GamePhase.endOfRound:
-          null;
+          break;
+        case GamePhase.endOfGame:
           break;
         default:
           break;
@@ -102,6 +107,13 @@ class _BoardWidgetState extends State<BoardWidget> {
 
     /* INIT GAME */
     if (controller.currentPhase == GamePhase.initGame) {
+      // Decide who is the dealder TODO choose who is the dealer, lasts 5 rounds then gives role to left player.
+      controller.game.dealerId = players[0]!.id;
+      
+      // Init round
+      controller.game.round = Round(players);
+      controller.game.round.centerCards = selectedCards;
+
       // Widgets
       boardCenter = () => AnimatedPositioned(
         duration: Duration(milliseconds: 500),
@@ -119,12 +131,6 @@ class _BoardWidgetState extends State<BoardWidget> {
 
     /* DISTRIBUTE POINT_CARD_PACK */
     else if (controller.currentPhase == GamePhase.distributePointCardPack) {
-      // Decide who is the dealder TODO choose who is the dealer, lasts 5 rounds then gives role to left player.
-      controller.game.dealerIndex = 3;
-      
-      // Init round
-      controller.game.round = Round(players);
-      controller.game.round.centerCards = selectedCards;
       controller.game.initialCardPack.shuffle();
 
       // Distribute cards to players
@@ -176,11 +182,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         player: players[i]!,
         cardHeight: cardHeight,
         cardWidth: cardWidth,
-        onTap: () {
-          setState(() {
-            selectedCards[i] = players[i]!.deck.peek();
-          });
-        },
+        onTap: (cardIndex) {},
       );
 
       sharedPlayerSlot = (i) => CardPackWidget(
@@ -195,7 +197,8 @@ class _BoardWidgetState extends State<BoardWidget> {
           value: players[0]!.tricksBid,
           onChanged: (v) => setState(() {
             players[0]!.tricksBid = v;
-            controller.nextPhase();
+            controller.game.round.bid(controller.game.dealerId, players[0]!.id);
+            controller.nextPhase(false);
           }),
         ),
       );
@@ -203,16 +206,138 @@ class _BoardWidgetState extends State<BoardWidget> {
  
     /* PLACE CARDS */
     else if (controller.currentPhase == GamePhase.placeCards) {
+      voidPlayer.deck.pickAll(controller.game.round.centerCards);
+
       // Widgets
-      sharedPlayerArea = (i) => SpreadCardPackWidget(
+      sharedPlayerArea = (i) => i != 0 ? SpreadCardPackWidget(
         player: players[i]!,
         cardHeight: cardHeight,
         cardWidth: cardWidth,
-        onTap: () {
+        onTap: (cardIndex) {},
+      ) : HorizontallySpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {
           setState(() {
-            selectedCards[i] = players[i]!.deck.peek();
+            selectedCards[i] = players[i]!.playCard(players[i]!.deck.cards[cardIndex]);
+            controller.game.round.placeCards(players[0]!.id);
+            controller.nextPhase(false);
           });
         },
+      );
+
+      sharedPlayerSlot = (i) => CardPackWidget(
+        player: players[i]!,
+        cardPack: players[i]?.pointDeck,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+      );
+
+      List<List<double?>> positions = [
+        [0, null, 0, 50],
+        [50, 0, null, 0],
+        [0, 50, 0, null],
+        [null, 0, 50, 0],
+      ];
+      boardCenter = () => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (int i = 0; i < players.length; i++) AnimatedPositioned(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            left: selectedCards[i] != null ? positions[i][0] : null,
+            top: selectedCards[i] != null ? positions[i][1] : null, 
+            right: selectedCards[i] != null ? positions[i][2] : null,
+            bottom: selectedCards[i] != null ? positions[i][3] : null,
+            child: selectedCards[i] != null ? CardWidget(
+              player: players[i]!,
+              card: selectedCards[i],
+              cardWidth: cardWidth,
+              cardHeight: cardHeight,
+            ) : Container(),
+          )
+        ],
+      );
+    }
+
+    /* GET TRICK WINNER */
+    else if (controller.currentPhase == GamePhase.getTrickWinner) {
+      controller.game.round.lookForTrickWinner();
+      if (players[0]!.deck.isEmpty) {
+        controller.nextPhase(true);
+      } else {
+        controller.delaySequence(true);
+      }
+
+      // Widgets
+      sharedPlayerArea = (i) => i != 0 ? SpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
+      ) : HorizontallySpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
+      );
+
+      sharedPlayerSlot = (i) => CardPackWidget(
+        player: players[i]!,
+        cardPack: players[i]?.pointDeck,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+      );
+
+      List<List<double?>> positions = [
+        [0, null, 0, 50],
+        [50, 0, null, 0],
+        [0, 50, 0, null],
+        [null, 0, 50, 0],
+      ];
+      boardCenter = () => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (int i = 0; i < players.length; i++) AnimatedPositioned(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            left: selectedCards[i] != null ? positions[i][0] : null,
+            top: selectedCards[i] != null ? positions[i][1] : null, 
+            right: selectedCards[i] != null ? positions[i][2] : null,
+            bottom: selectedCards[i] != null ? positions[i][3] : null,
+            child: selectedCards[i] != null ? CardWidget(
+              player: players[i]!,
+              card: selectedCards[i],
+              cardWidth: cardWidth,
+              cardHeight: cardHeight,
+            ) : Container(),
+          )
+        ],
+      );
+    }
+
+    /* END OF ROUND */
+    else if (controller.currentPhase == GamePhase.endOfRound) {
+      controller.game.round.lookForRoundWinner();
+      if (controller.game.round.roundNumber == controller.game.round.roundCount) {
+        controller.nextPhase(true);
+      } else {
+        controller.game.round.nextRound();
+        controller.delaySequence(true);
+      }
+      
+      // Widgets
+      sharedPlayerArea = (i) => i != 0 ? SpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
+      ) : HorizontallySpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: (cardIndex) {},
       );
 
       sharedPlayerSlot = (i) => CardPackWidget(

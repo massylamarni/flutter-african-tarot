@@ -6,7 +6,9 @@ enum GamePhase {
   distributePointCardPack,
   placeBids,
   placeCards,
+  getTrickWinner,
   endOfRound,
+  endOfGame,
 }
 
 class GameController extends ChangeNotifier {
@@ -15,17 +17,20 @@ class GameController extends ChangeNotifier {
 
   GameController(this.game);
 
-  void startInitGameSequence() async {
+  void delaySequence(bool moveToNextPhase) async {
     await Future.delayed(Duration(seconds: 2));
-    nextPhase();
+    moveToNextPhase ? nextPhase(false) : null;
+  }
+
+  void startInitGameSequence() async {
+    delaySequence(true);
   }
 
   void startDistributePointCardPackSequence() async {
-    await Future.delayed(Duration(seconds: 2));
-    nextPhase();
+    delaySequence(true);
   }
 
-  void nextPhase() {
+  void nextPhase(bool isEdgeCase) {
     switch(currentPhase) {
       case GamePhase.initGame:
         currentPhase = GamePhase.distributePointCardPack;
@@ -37,9 +42,15 @@ class GameController extends ChangeNotifier {
         currentPhase = GamePhase.placeCards;
         break;
       case GamePhase.placeCards:
-        currentPhase = GamePhase.endOfRound;
+        currentPhase = GamePhase.getTrickWinner;
+        break;
+      case GamePhase.getTrickWinner:
+        currentPhase = isEdgeCase ? GamePhase.endOfRound : GamePhase.placeCards;
         break;
       case GamePhase.endOfRound:
+        currentPhase = isEdgeCase ? GamePhase.endOfGame : GamePhase.distributePointCardPack;
+        break;
+      case GamePhase.endOfGame:
         currentPhase = GamePhase.initGame;
         break;
     }

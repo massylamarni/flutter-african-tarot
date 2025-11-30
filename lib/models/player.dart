@@ -46,6 +46,7 @@ class Player {
   }
 
   void receiveCard(Card card) {
+    card.belongsTo = id;
     deck.add(card);
   }
 

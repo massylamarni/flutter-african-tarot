@@ -5,10 +5,11 @@ import 'package:tarot_africain/models/card.dart' as card_model;
 class CardWidget extends StatelessWidget {
   final Player player;
   final card_model.Card? card;
-  final VoidCallback? onTap;
+  final Function()? onTap;
   final double? cardWidth;
   final double? cardHeight;
   final bool? disableRotation;
+  final bool? disableGestureDetector;
 
   const CardWidget({
     super.key,
@@ -18,6 +19,7 @@ class CardWidget extends StatelessWidget {
     this.cardWidth,
     this.cardHeight,
     this.disableRotation,
+    this.disableGestureDetector,
   });
 
   @override
@@ -37,13 +39,17 @@ class CardWidget extends StatelessWidget {
     }
 
     if (cardWidth != null && cardHeight != null) {
-      final double adaptedWidth = player.hasVerticalPosition ? cardHeight! : cardHeight!;
-      final double adaptedHeight = player.hasVerticalPosition ? cardHeight! : cardHeight!;
+      final double adaptedWidth = player.hasVerticalPosition ? cardWidth! : cardHeight!;
+      final double adaptedHeight = player.hasVerticalPosition ? cardHeight! : cardWidth!;
       cardWidget = SizedBox(width: adaptedWidth, height: adaptedHeight, child: cardWidget);
     }
 
-    if (onTap != null) {
-      cardWidget = GestureDetector(onTap: onTap, child: cardWidget);
+    if (onTap != null && disableGestureDetector == null) {
+      cardWidget = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: cardWidget,
+      );
     }
 
     return cardWidget;

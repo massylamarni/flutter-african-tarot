@@ -7,7 +7,7 @@ const int hotFix0 = 80; // Magic number that fixes card pack position
 
 class SpreadCardPackWidget extends StatelessWidget {
   final Player player;
-  final VoidCallback? onTap;
+  final Function(int)? onTap;
   final double cardWidth;
   final double cardHeight;
   final double radius;
@@ -26,7 +26,7 @@ class SpreadCardPackWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int cardCount = player.deck.cards.length;
-    final double adaptedWidth = (player.hasVerticalPosition ? cardHeight : cardHeight);
+    final double adaptedWidth = (player.hasVerticalPosition ? cardWidth : cardHeight);
     final double adaptedHeight = (player.hasVerticalPosition ? cardHeight : cardHeight);
   
     double getArcAngle(int index) {
@@ -67,15 +67,18 @@ class SpreadCardPackWidget extends StatelessWidget {
           for (int i = 0; i < cardCount; i++)
             Transform.translate(
               offset: getShiftedPosition(i),
-              child: Transform.rotate(
-                angle: getRotationAngle(i),
-                child: CardWidget(
-                  player: player,
-                  card: player.deck.cards[i],
-                  cardWidth: adaptedWidth,
-                  cardHeight: adaptedHeight,
-                  disableRotation: true,
-                  onTap: i == cardCount - 1 ? onTap : null,
+              child: GestureDetector(
+                onTap: () => onTap!(i),
+                child: Transform.rotate(
+                  angle: getRotationAngle(i),
+                  child: CardWidget(
+                    player: player,
+                    card: player.deck.cards[i],
+                    cardWidth: adaptedWidth,
+                    cardHeight: adaptedHeight,
+                    disableRotation: true,
+                    disableGestureDetector: true,
+                  ),
                 ),
               ),
             ),

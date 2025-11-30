@@ -117,6 +117,12 @@ class CardPack {
     return cards.last;
   }
 
+  void belongsTo(int playerId) {
+    for (Card card in cards) {
+      card.belongsTo = playerId;
+    }
+  }
+
   bool get isEmpty => cards.isEmpty;
 
   @override
