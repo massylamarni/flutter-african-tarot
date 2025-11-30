@@ -29,33 +29,50 @@ class Round {
     for (int i = 0; i < players.length; i++) {
       int playerId = (dealerId + 1 + i) % players.length;
       if (playerId == mainPlayerId) continue;
-      int announcement = (playerId == dealerId) ? _announceWithRestriction(announcementsSum) : _announceNormally();
+      CardPack cardPack = players[playerId]!.deck;
+      int announcement = (playerId == dealerId) ? _announceWithRestriction(cardPack, announcementsSum) : _announceNormally(cardPack);
       announcementsSum += announcement;
       players[playerId]?.announceTrick(announcement);
     }
+  }
+
+  int _announceNormally(CardPack cardPack) {
+    const int BIG_CARD_START_RANGE = 12;
+    final int playerAffinity = rng.nextInt(8);
+    int bigCardsCount = 0;
+    for (Card card in cardPack.cards) {
+      if (card.cardValue > (BIG_CARD_START_RANGE + playerAffinity)) bigCardsCount++;
+    }
+    return bigCardsCount;
+  }
+
+  int _announceWithRestriction(CardPack cardPack, int announcementsSum) {
+    int announcement= _announceNormally(cardPack);
+    if (announcement+ announcementsSum == 5) {
+      announcement= announcement + (rng.nextInt(1) == 0 ? -1 : 1);
+    }
+    return announcement;
   }
 
   // Cards are played until the pack is empty
   void placeCards(int mainPlayerId) {
     for (var player in players.values) {
       if (player.id == mainPlayerId) continue;
-      placeCard(player);
+      
+      int cardCount = player.deck.cards.length;
+      Card placedCard;
+      if (cardCount <= 1) {
+        placedCard = player.deck.peek();
+      } else {
+        placedCard = player.deck.cards[rng.nextInt(cardCount - 1)]; // "Le hasard fait bien les choses"
+      }
+      
+      centerCards[player.id] = placedCard;
+      player.playCard(placedCard);
     }
 
     // TODO trick winner starts next round
     // TODO an excuse lets the player chose any value
-  }
-
-  int _announceNormally() {
-    return rng.nextInt(3); // "Le hasard fait bien les choses"
-  }
-
-  int _announceWithRestriction(int announcementsSum) {
-    int randomAnnouncement = rng.nextInt(3);
-    if (randomAnnouncement + announcementsSum == 5) {
-      randomAnnouncement = randomAnnouncement + 1;
-    }
-    return randomAnnouncement;
   }
 
   void placeCard(Player player) {
