@@ -27,21 +27,20 @@ class BoardWidget extends StatefulWidget {
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
-  GameController controller = GameController(Game([]));
-  Player mainPlayer = Player("Main player", PlayerPosition.bottom);
-  card_model.Card? selectedCard;
+  GameController controller = GameController(Game({}));
+  Player mainPlayer = Player(0, "Main player", PlayerPosition.bottom);
+  Map<int, card_model.Card> selectedCards = {};
   Alignment selectedCardAlignment = Alignment.center;
-  bool cardInCenter = false;
 
   @override
   void initState() {
     super.initState();
-    controller.game = Game([
-      Player("Player 1", PlayerPosition.left),
-      Player("Player 2", PlayerPosition.top),
-      Player("Player 3", PlayerPosition.right),
-      mainPlayer,
-    ]);
+    controller.game = Game({
+      0: mainPlayer,
+      1: Player(1, "Player 1", PlayerPosition.left),
+      2: Player(2, "Player 2", PlayerPosition.top),
+      3: Player(3, "Player 3", PlayerPosition.right),
+    });
 
     controller.addListener(_onPhaseChanged);
     controller.startInitGameSequence();
@@ -84,12 +83,12 @@ class _BoardWidgetState extends State<BoardWidget> {
     final double cardHeight = boardSize * 1 / 4;
     final double cardWidth = cardHeight * cardAspectRatio;
     final double margins = 0;
-    final List<Player> players = controller.game.players;
-    Player voidPlayer = Player("VOID_PLAYER", PlayerPosition.bottom);
-    Player heartsPlayer = Player("HEARTS_PLAYER", PlayerPosition.bottom);
-    Player spadesPlayer = Player("SPADES_PLAYER", PlayerPosition.bottom);
-    Player clubsPlayer = Player("CLUBS_PLAYER", PlayerPosition.bottom);
-    Player diamondsPlayer = Player("DIAMONS_PLAYER", PlayerPosition.bottom);
+    final Map<int, Player> players = controller.game.players;
+    Player voidPlayer = Player.voidPlayer();
+    Player heartsPlayer = Player.heartsPlayer();
+    Player spadesPlayer = Player.spadesPlayer();
+    Player clubsPlayer = Player.clubsPlayer();
+    Player diamondsPlayer = Player.diamondsPlayer();
     voidPlayer.deck = controller.game.initialCardPack;
     heartsPlayer.deck = controller.game.heartsCardpack;
     spadesPlayer.deck = controller.game.spadesCardpack;
@@ -107,10 +106,10 @@ class _BoardWidgetState extends State<BoardWidget> {
       // Distribute cards to players
       controller.game.round.distributeCards(controller.game.initialCardPack, controller.game.round.distributedCardCount);
     } else if (controller.currentPhase == GamePhase.placeBids) {
-      players[0].pointDeck = clubsPlayer.deck;
-      players[1].pointDeck = heartsPlayer.deck;
-      players[2].pointDeck = spadesPlayer.deck;
-      mainPlayer.pointDeck = diamondsPlayer.deck;
+      players[0]?.pointDeck = diamondsPlayer.deck;
+      players[1]?.pointDeck = clubsPlayer.deck;
+      players[2]?.pointDeck = heartsPlayer.deck;
+      players[3]?.pointDeck = spadesPlayer.deck;
     }
 
     Widget sharedPlayerArea(int index) {
@@ -121,12 +120,12 @@ class _BoardWidgetState extends State<BoardWidget> {
         return Container();
       } else {
         widget = SpreadCardPackWidget(
-          player: players[index],
+          player: players[index]!,
           cardHeight: cardHeight,
           cardWidth: cardWidth,
           onTap: () {
             setState(() {
-              selectedCard = players[index].deck.peek();
+              selectedCards[index] = players[index]!.deck.peek();
             });
           },
         );
@@ -143,13 +142,13 @@ class _BoardWidgetState extends State<BoardWidget> {
         return Container();
       } else if (controller.currentPhase == GamePhase.placeBids) {
         widget = CardPackWidget(
-          player: players[index],
-          cardPack: players[index].pointDeck,
+          player: players[index]!,
+          cardPack: players[index]?.pointDeck,
           cardHeight: cardHeight,
           cardWidth: cardWidth,
           onTap: () {
             setState(() {
-              selectedCard = players[index].pointDeck.peek();
+              selectedCards[index] = players[index]!.pointDeck.peek();
             });
           },
         );
@@ -157,12 +156,12 @@ class _BoardWidgetState extends State<BoardWidget> {
         return widget;
       } else {
         widget = CardPackWidget(
-          player: players[index],
+          player: players[index]!,
           cardHeight: cardHeight,
           cardWidth: cardWidth,
           onTap: () {
             setState(() {
-              selectedCard = players[index].deck.peek();
+              selectedCards[index] = players[index]!.deck.peek();
             });
           },
         );
@@ -172,35 +171,35 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
 
     Widget leftPlayerArea() {      
-      return sharedPlayerArea(0);
-    }
-
-    Widget topPlayerArea() {
       return sharedPlayerArea(1);
     }
 
-    Widget rightPlayerArea() {
+    Widget topPlayerArea() {
       return sharedPlayerArea(2);
     }
 
-    Widget bottomPlayerArea() {
+    Widget rightPlayerArea() {
       return sharedPlayerArea(3);
     }
 
-    Widget leftPlayerSlot() {
-      return sharedPlayerSlot(0);
+    Widget bottomPlayerArea() {
+      return sharedPlayerArea(0);
     }
 
-    Widget topPlayerSlot() {
+    Widget leftPlayerSlot() {
       return sharedPlayerSlot(1);
     }
 
+    Widget topPlayerSlot() {
+      return sharedPlayerSlot(2);
+    }
+
     Widget rightPlayerSlot() {
-      return sharedPlayerSlot(2);      
+      return sharedPlayerSlot(3);      
     }
 
     Widget bottomPlayerSlot() {
-      return sharedPlayerSlot(3);      
+      return sharedPlayerSlot(0);      
     }
 
     Widget boardCenter() {
@@ -270,40 +269,42 @@ class _BoardWidgetState extends State<BoardWidget> {
           ],
         );
       } else if (controller.currentPhase == GamePhase.placeBids) {
+        bool isCardSelected = selectedCards[0] != null;
         widget = AnimatedPositioned(
           duration: Duration(milliseconds: 500),
           curve: Curves.easeInOut,
-          top: cardInCenter ? 50 : 0,
-          bottom: cardInCenter ? null : 0,
-          left: cardInCenter ? 0 : null,
-          right: cardInCenter ? 0 : null,
+          top: isCardSelected ? 50 : 0,
+          bottom: isCardSelected ? null : 0,
+          left: isCardSelected ? 0 : null,
+          right: isCardSelected ? 0 : null,
           child: CardWidget(
-            player: players[1],
+            player: players[1]!,
             cardWidth: cardWidth,
             cardHeight: cardHeight,
             onTap: () {
               setState(() {
-                cardInCenter = !cardInCenter;
+                isCardSelected = !isCardSelected;
               });
             },
           ),
         );
         return widget;
       } else {
+        bool isCardSelected = selectedCards[1] != null;
         widget = AnimatedPositioned(
           duration: Duration(milliseconds: 500),
           curve: Curves.easeInOut,
-          top: cardInCenter ? 50 : 0,
-          bottom: cardInCenter ? null : 0,
-          left: cardInCenter ? 0 : null,
-          right: cardInCenter ? 0 : null,
+          top: isCardSelected ? 50 : 0,
+          bottom: isCardSelected ? null : 0,
+          left: isCardSelected ? 0 : null,
+          right: isCardSelected ? 0 : null,
           child: CardWidget(
-            player: players[1],
+            player: players[1]!,
             cardWidth: cardWidth,
             cardHeight: cardHeight,
             onTap: () {
               setState(() {
-                cardInCenter = !cardInCenter;
+                isCardSelected = !isCardSelected;
               });
             },
           ),
@@ -353,7 +354,7 @@ class _BoardWidgetState extends State<BoardWidget> {
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(child: PlayerWidget(player: players[1])),
+                                    Expanded(child: PlayerWidget(player: players[2]!)),
                                   ],
                                 )
                               ),
@@ -361,8 +362,8 @@ class _BoardWidgetState extends State<BoardWidget> {
                                 flex: 2,
                                 child: Row(
                                   children: [
-                                    Expanded(child: PlayerWidget(player: players[0])),
-                                    Expanded(child: PlayerWidget(player: players[2])),
+                                    Expanded(child: PlayerWidget(player: players[1]!)),
+                                    Expanded(child: PlayerWidget(player: players[3]!)),
                                   ],
                                 )
                               ),
@@ -371,7 +372,7 @@ class _BoardWidgetState extends State<BoardWidget> {
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Expanded(child: PlayerWidget(player: players[3])),
+                                    Expanded(child: PlayerWidget(player: players[0]!)),
                                   ],
                                 )
                               ),

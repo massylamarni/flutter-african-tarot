@@ -23,11 +23,11 @@ class CardPackWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int cardCount = player.deck.cards.length;
+    final CardPack playerCardPack = cardPack ?? player.deck;
+    final int cardCount = playerCardPack.cards.length;
     final double adaptedWidth = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double adaptedHeight = player.hasVerticalPosition ? cardHeight : cardHeight;
     final double maxOffsetSize = (cardCount - 1) * offset;
-    final CardPack playerCardPack = cardPack ?? player.deck;
 
     Widget cardPackWidget = Stack(
         clipBehavior: Clip.none,

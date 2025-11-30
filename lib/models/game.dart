@@ -4,7 +4,7 @@ import './round.dart';
 import 'dart:math';
 
 class Game {
-  List<Player> players;
+  Map<int, Player> players;
   late Round round;
   int dealerIndex = 0;
   final CardPack initialCardPack = CardPack.playable();
@@ -32,13 +32,13 @@ class Game {
         int playerIndex = (i+1) % players.length;
         int announcement = (playerIndex == dealerIndex) ? _announceWithRestriction(announcementsSum) : _announceNormally();
         announcementsSum += announcement;
-        players[playerIndex].announceTrick(announcement);
+        players[playerIndex]?.announceTrick(announcement);
       }
 
       // Cards are played until the pack is empty
       for (int roundCardCount = round.roundCount - round.roundNumber; roundCardCount >= 1; roundCardCount--) {
         // Each player plays a card
-        for (var player in players) {
+        for (var player in players.values) {
           round.placeCard(player);
         }
 

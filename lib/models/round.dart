@@ -4,7 +4,7 @@ import './player.dart';
 import './card.dart';
 
 class Round {
-  final List<Player> players;
+  final Map<int, Player> players;
   final int roundCount = 5;
   List<Card> centerCards = [];
   int roundNumber = 1;
@@ -13,7 +13,7 @@ class Round {
 
   void distributeCards(CardPack cardPack, int nbCards) {
     for (int i = 0; i <= nbCards; i++) {
-      for (var player in players) {
+      for (var player in players.values) {
         if (cardPack.isEmpty) continue;
         player.receiveCard(cardPack.take());
       }
@@ -27,7 +27,7 @@ class Round {
 
   Player lookForTrickWinner() {
     Card maxCard = centerCards[0];
-    Player winner = players[0];
+    Player winner = players[0]!;
 
     for (int i = 1; i < centerCards.length; i++) {
       if (_compareCards(centerCards[i], maxCard) > 0) {
@@ -35,7 +35,7 @@ class Round {
       }
     }
 
-    for (Player player in players) {
+    for (Player player in players.values) {
       if (player.deck.cards.contains(maxCard)) winner = player;
     }
 
@@ -44,9 +44,9 @@ class Round {
   }
 
   Player lookForRoundWinner() {
-    Player winner = players[0];
+    Player winner = players[0]!;
 
-    for (var player in players) {
+    for (var player in players.values) {
       player.updatePoints();
       if (player.points > winner.points) {
         winner = player;

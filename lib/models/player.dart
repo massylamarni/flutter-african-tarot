@@ -4,6 +4,7 @@ import './card_pack.dart';
 enum PlayerPosition { left, top, right, bottom }
 
 class Player {
+  final int id;
   final String name;
   final PlayerPosition position;
   CardPack deck = CardPack([]);
@@ -12,7 +13,37 @@ class Player {
   int tricksWon = 0;
   int points = 14;
 
-  Player(this.name, this.position);
+  Player(this.id, this.name, this.position);
+
+  factory Player.voidPlayer() {
+    Player voidPlayer = Player(-1, "VOID_PLAYER", PlayerPosition.bottom);
+    voidPlayer.deck = CardPack.playable();
+    return voidPlayer;
+  }
+
+  factory Player.heartsPlayer() {
+    Player heartsPlayer = Player(-2, "HEARTS_PLAYER", PlayerPosition.bottom);
+    heartsPlayer.deck = CardPack.hearts();
+    return heartsPlayer;
+  }
+
+  factory Player.spadesPlayer() {
+    Player spadesPlayer = Player(-3, "SPADES_PLAYER", PlayerPosition.bottom);
+    spadesPlayer.deck = CardPack.spades();
+    return spadesPlayer;
+  }
+
+  factory Player.clubsPlayer() {
+    Player clubsPlayer = Player(-4, "CLUBS_PLAYER", PlayerPosition.bottom);
+    clubsPlayer.deck = CardPack.clubs();
+    return clubsPlayer;
+  }
+
+  factory Player.diamondsPlayer() {
+    Player diamondsPlayer = Player(-5, "DIAMONS_PLAYER", PlayerPosition.bottom);
+    diamondsPlayer.deck = CardPack.diamonds();
+    return diamondsPlayer;
+  }
 
   void receiveCard(Card card) {
     deck.add(card);
