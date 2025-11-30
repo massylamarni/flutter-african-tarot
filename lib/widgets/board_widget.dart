@@ -239,9 +239,9 @@ class _BoardWidgetState extends State<BoardWidget> {
           barrierDismissible: true,
           builder: (dialogContext) {
             return Dialog(
-              insetPadding: EdgeInsets.all(5),
+              insetPadding: EdgeInsets.all(0),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(7),
                 child: SizedBox(
                   width: 250,
                   height: 300,

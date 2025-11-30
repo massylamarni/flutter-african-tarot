@@ -23,16 +23,15 @@ class ExcuseSelectorWidget extends StatelessWidget {
           return GestureDetector(
             onTap: () => onChanged(number),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              height: 35,
+              width: 35,
+              margin: EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: selected ? Colors.blue : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
+                border: Border.all(color: selected ? Colors.blue : Colors.black),
+                borderRadius: BorderRadius.circular(10)
               ),
               child: Text(
+                textAlign: TextAlign.center,
                 number.toString(),
                 style: TextStyle(
                   fontSize: 22,
