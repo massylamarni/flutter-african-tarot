@@ -20,12 +20,6 @@ class Game {
 
   void startGame() {
     while (round.roundNumber != round.roundCount) {
-      // Distribute cards to players
-      for (int roundCardCount = round.roundCount - round.roundNumber; roundCardCount >= 1; roundCardCount--) {
-        round.distributeCards(initialCardPack, roundCardCount);
-      }
-
-
       // Each player bids, clockwise, dealer is last to bid
       int announcementsSum = 0;
       for (int i = 0; i < players.length; i++) {

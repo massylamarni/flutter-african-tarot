@@ -6,6 +6,7 @@ import 'package:tarot_africain/models/card.dart' as card_model;
 import 'package:tarot_africain/models/round.dart';
 import 'package:tarot_africain/utils/game_controller.dart';
 import 'package:tarot_africain/widgets/player_widget.dart';
+import 'package:tarot_africain/widgets/trick_selector_widget.dart';
 import './card_pack_widget.dart';
 import './spread_card_pack_widget.dart';
 import './card_widget.dart';
@@ -95,7 +96,29 @@ class _BoardWidgetState extends State<BoardWidget> {
     clubsPlayer.deck = controller.game.clubsCardpack;
     diamondsPlayer.deck = controller.game.diamondsCardpack;
 
-    if (controller.currentPhase == GamePhase.distributePointCardPack) {
+    Widget Function(int) sharedPlayerArea = (i) => Container();
+    Widget Function(int) sharedPlayerSlot = (i) => Container();
+    Widget Function() boardCenter = () => Container();
+
+    /* INIT GAME */
+    if (controller.currentPhase == GamePhase.initGame) {
+      // Widgets
+      boardCenter = () => AnimatedPositioned(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        top: 50,
+        left: 0,
+        right: 0,
+        child: CardPackWidget(
+          player: voidPlayer,
+          cardWidth: cardWidth,
+          cardHeight: cardHeight
+        )
+      );
+    }
+
+    /* DISTRIBUTE POINT_CARD_PACK */
+    else if (controller.currentPhase == GamePhase.distributePointCardPack) {
       // Decide who is the dealder TODO choose who is the dealer, lasts 5 rounds then gives role to left player.
       controller.game.dealerIndex = 3;
       
@@ -106,88 +129,9 @@ class _BoardWidgetState extends State<BoardWidget> {
 
       // Distribute cards to players
       controller.game.round.distributeCards(controller.game.initialCardPack, controller.game.round.distributedCardCount);
-    } else if (controller.currentPhase == GamePhase.placeBids) {
-      players[0]?.pointDeck = diamondsPlayer.deck;
-      players[1]?.pointDeck = clubsPlayer.deck;
-      players[2]?.pointDeck = heartsPlayer.deck;
-      players[3]?.pointDeck = spadesPlayer.deck;
-    }
 
-    Widget sharedPlayerArea(int index) {
-      Widget widget;
-      if (controller.currentPhase == GamePhase.initGame) {
-        return Container();
-      } else if (controller.currentPhase == GamePhase.distributePointCardPack) {
-        return Container();
-      } else {
-        widget = SpreadCardPackWidget(
-          player: players[index]!,
-          cardHeight: cardHeight,
-          cardWidth: cardWidth,
-          onTap: () {
-            setState(() {
-              selectedCards[index] = players[index]!.deck.peek();
-            });
-          },
-        );
-      }
-      
-      return widget;
-    }
-
-    Widget sharedPlayerSlot(int index) {
-      Widget widget;
-      if (controller.currentPhase == GamePhase.initGame) {
-        return Container();
-      } else if (controller.currentPhase == GamePhase.distributePointCardPack) {
-        return Container();
-      } else if (controller.currentPhase == GamePhase.placeBids) {
-        widget = CardPackWidget(
-          player: players[index]!,
-          cardPack: players[index]?.pointDeck,
-          cardHeight: cardHeight,
-          cardWidth: cardWidth,
-        );
-
-        return widget;
-      } else {
-        widget = CardPackWidget(
-          player: players[index]!,
-          cardHeight: cardHeight,
-          cardWidth: cardWidth,
-        );
-
-        return widget;
-      }
-    }
-
-    Widget leftPlayerArea() {return sharedPlayerArea(1);}
-    Widget topPlayerArea() {return sharedPlayerArea(2);}
-    Widget rightPlayerArea() {return sharedPlayerArea(3);}
-    Widget bottomPlayerArea() {return sharedPlayerArea(0);}
-
-    Widget leftPlayerSlot() {return sharedPlayerSlot(1);}
-    Widget topPlayerSlot() {return sharedPlayerSlot(2);}
-    Widget rightPlayerSlot() {return sharedPlayerSlot(3);}
-    Widget bottomPlayerSlot() {return sharedPlayerSlot(0);}
-
-    Widget boardCenter() {
-      Widget widget;
-      if (controller.currentPhase == GamePhase.initGame) {
-        widget = AnimatedPositioned(
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-          top: 50,
-          left: 0,
-          right: 0,
-          child: CardPackWidget(
-            player: voidPlayer,
-            cardWidth: cardWidth,
-            cardHeight: cardHeight
-          )
-        );
-      } else if (controller.currentPhase == GamePhase.distributePointCardPack) {
-        double spacing = -30;
+      // Widgets
+      double spacing = -30;
         List<List<double?>> positions = [
           [spacing, spacing, null, null],
           [null, spacing, spacing, null],
@@ -200,7 +144,7 @@ class _BoardWidgetState extends State<BoardWidget> {
           clubsPlayer,
           diamondsPlayer
         ];
-        widget = Stack(
+        boardCenter = () => Stack(
           clipBehavior: Clip.none,
           children: [
             for (int i = 0; i < players.length; i++) AnimatedPositioned(
@@ -218,62 +162,102 @@ class _BoardWidgetState extends State<BoardWidget> {
             ),
           ],
         );
-      } else if (controller.currentPhase == GamePhase.placeBids) {
-        List<List<double?>> positions = [
-          [0, null, 0, 50],
-          [50, 0, null, 0],
-          [0, 50, 0, null],
-          [null, 0, 50, 0],
-        ];
-        widget = Stack(
-          clipBehavior: Clip.none,
-          children: [
-            for (int i = 0; i < players.length; i++) AnimatedPositioned(
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              left: selectedCards[i] != null ? positions[i][0] : null,
-              top: selectedCards[i] != null ? positions[i][1] : null, 
-              right: selectedCards[i] != null ? positions[i][2] : null,
-              bottom: selectedCards[i] != null ? positions[i][3] : null,
-              child: selectedCards[i] != null ? CardWidget(
-                player: players[i]!,
-                card: selectedCards[i],
-                cardWidth: cardWidth,
-                cardHeight: cardHeight,
-              ) : Container(),
-            )
-          ],
-        );
-        return widget;
-      } else {
-        List<List<double?>> positions = [
-          [0, null, 0, 50],
-          [50, 0, null, 0],
-          [0, 50, 0, null],
-          [null, 0, 50, 0],
-        ];
-        widget = Stack(
-          clipBehavior: Clip.none,
-          children: [
-            for (int i = 0; i < players.length; i++) AnimatedPositioned(
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              left: selectedCards[i] != null ? positions[i][0] : null,
-              top: selectedCards[i] != null ? positions[i][1] : null, 
-              right: selectedCards[i] != null ? positions[i][2] : null,
-              bottom: selectedCards[i] != null ? positions[i][3] : null,
-              child: selectedCards[i] != null ? CardWidget(
-                player: players[i]!,
-                card: selectedCards[i],
-                cardWidth: cardWidth,
-                cardHeight: cardHeight,
-              ) : Container(),
-            )
-          ],
-        );
-      }
-      return widget;
     }
+    
+    /* PLACE BIDS */
+    else if (controller.currentPhase == GamePhase.placeBids) {
+      players[0]?.pointDeck = diamondsPlayer.deck;
+      players[1]?.pointDeck = clubsPlayer.deck;
+      players[2]?.pointDeck = heartsPlayer.deck;
+      players[3]?.pointDeck = spadesPlayer.deck;
+
+      // Widgets
+      sharedPlayerArea = (i) => SpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: () {
+          setState(() {
+            selectedCards[i] = players[i]!.deck.peek();
+          });
+        },
+      );
+
+      sharedPlayerSlot = (i) => CardPackWidget(
+        player: players[i]!,
+        cardPack: players[i]?.pointDeck,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+      );
+
+      boardCenter = () => Center(
+        child: TrickSelectorWidget(
+          value: players[0]!.tricksBid,
+          onChanged: (v) => setState(() {
+            players[0]!.tricksBid = v;
+            controller.nextPhase();
+          }),
+        ),
+      );
+    }
+ 
+    /* PLACE CARDS */
+    else if (controller.currentPhase == GamePhase.placeCards) {
+      // Widgets
+      sharedPlayerArea = (i) => SpreadCardPackWidget(
+        player: players[i]!,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+        onTap: () {
+          setState(() {
+            selectedCards[i] = players[i]!.deck.peek();
+          });
+        },
+      );
+
+      sharedPlayerSlot = (i) => CardPackWidget(
+        player: players[i]!,
+        cardPack: players[i]?.pointDeck,
+        cardHeight: cardHeight,
+        cardWidth: cardWidth,
+      );
+
+      List<List<double?>> positions = [
+        [0, null, 0, 50],
+        [50, 0, null, 0],
+        [0, 50, 0, null],
+        [null, 0, 50, 0],
+      ];
+      boardCenter = () => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (int i = 0; i < players.length; i++) AnimatedPositioned(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            left: selectedCards[i] != null ? positions[i][0] : null,
+            top: selectedCards[i] != null ? positions[i][1] : null, 
+            right: selectedCards[i] != null ? positions[i][2] : null,
+            bottom: selectedCards[i] != null ? positions[i][3] : null,
+            child: selectedCards[i] != null ? CardWidget(
+              player: players[i]!,
+              card: selectedCards[i],
+              cardWidth: cardWidth,
+              cardHeight: cardHeight,
+            ) : Container(),
+          )
+        ],
+      );
+    }
+
+    Widget leftPlayerArea() {return sharedPlayerArea(1);}
+    Widget topPlayerArea() {return sharedPlayerArea(2);}
+    Widget rightPlayerArea() {return sharedPlayerArea(3);}
+    Widget bottomPlayerArea() {return sharedPlayerArea(0);}
+
+    Widget leftPlayerSlot() {return sharedPlayerSlot(1);}
+    Widget topPlayerSlot() {return sharedPlayerSlot(2);}
+    Widget rightPlayerSlot() {return sharedPlayerSlot(3);}
+    Widget bottomPlayerSlot() {return sharedPlayerSlot(0);}
 
     Widget boardWidget = Center(
       child: SizedBox(
