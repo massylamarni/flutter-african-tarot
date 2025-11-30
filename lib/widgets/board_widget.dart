@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:tarot_africain/models/game.dart';
 import 'package:tarot_africain/models/player.dart';
-import 'package:tarot_africain/models/card.dart' as cardModel;
+import 'package:tarot_africain/models/card.dart' as card_model;
 import 'package:tarot_africain/models/round.dart';
 import 'package:tarot_africain/utils/game_controller.dart';
+import 'package:tarot_africain/widgets/player_widget.dart';
 import './card_pack_widget.dart';
 import './spread_card_pack_widget.dart';
 import './card_widget.dart';
@@ -28,7 +29,7 @@ class BoardWidget extends StatefulWidget {
 class _BoardWidgetState extends State<BoardWidget> {
   GameController controller = GameController(Game([]));
   Player mainPlayer = Player("Main player", PlayerPosition.bottom);
-  cardModel.Card? selectedCard;
+  card_model.Card? selectedCard;
   Alignment selectedCardAlignment = Alignment.center;
   bool cardInCenter = false;
 
@@ -112,7 +113,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       mainPlayer.pointDeck = diamondsPlayer.deck;
     }
 
-    Widget _sharedPlayerArea(int index) {
+    Widget sharedPlayerArea(int index) {
       Widget widget;
       if (controller.currentPhase == GamePhase.initGame) {
         return Container();
@@ -134,7 +135,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       return widget;
     }
 
-    Widget _sharedPlayerSlot(int index) {
+    Widget sharedPlayerSlot(int index) {
       Widget widget;
       if (controller.currentPhase == GamePhase.initGame) {
         return Container();
@@ -170,39 +171,39 @@ class _BoardWidgetState extends State<BoardWidget> {
       }
     }
 
-    Widget _leftPlayerArea() {      
-      return _sharedPlayerArea(0);
+    Widget leftPlayerArea() {      
+      return sharedPlayerArea(0);
     }
 
-    Widget _topPlayerArea() {
-      return _sharedPlayerArea(1);
+    Widget topPlayerArea() {
+      return sharedPlayerArea(1);
     }
 
-    Widget _rightPlayerArea() {
-      return _sharedPlayerArea(2);
+    Widget rightPlayerArea() {
+      return sharedPlayerArea(2);
     }
 
-    Widget _bottomPlayerArea() {
-      return _sharedPlayerArea(3);
+    Widget bottomPlayerArea() {
+      return sharedPlayerArea(3);
     }
 
-    Widget _leftPlayerSlot() {
-      return _sharedPlayerSlot(0);
+    Widget leftPlayerSlot() {
+      return sharedPlayerSlot(0);
     }
 
-    Widget _topPlayerSlot() {
-      return _sharedPlayerSlot(1);
+    Widget topPlayerSlot() {
+      return sharedPlayerSlot(1);
     }
 
-    Widget _rightPlayerSlot() {
-      return _sharedPlayerSlot(2);      
+    Widget rightPlayerSlot() {
+      return sharedPlayerSlot(2);      
     }
 
-    Widget _bottomPlayerSlot() {
-      return _sharedPlayerSlot(3);      
+    Widget bottomPlayerSlot() {
+      return sharedPlayerSlot(3);      
     }
 
-    Widget _boardCenter() {
+    Widget boardCenter() {
       Widget widget;
       if (controller.currentPhase == GamePhase.initGame) {
         widget = AnimatedPositioned(
@@ -321,15 +322,15 @@ class _BoardWidgetState extends State<BoardWidget> {
               flex: 1,
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: _topPlayerSlot()),
+                  Expanded(flex: 1, child: topPlayerSlot()),
                   Expanded(
                     flex: 2,
                     child: Container(
                       alignment: Alignment.center,
-                      child: _topPlayerArea()
+                      child: topPlayerArea()
                     ),
                   ),
-                  Expanded(flex: 1, child: _rightPlayerSlot()),
+                  Expanded(flex: 1, child: rightPlayerSlot()),
                 ],
               ),
             ),
@@ -337,7 +338,7 @@ class _BoardWidgetState extends State<BoardWidget> {
               flex: 2,
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: _leftPlayerArea()),
+                  Expanded(flex: 1, child: leftPlayerArea()),
                   Expanded(
                     flex: 2,
                     child: Stack(
@@ -345,12 +346,43 @@ class _BoardWidgetState extends State<BoardWidget> {
                         Container(
                           margin: EdgeInsets.all(margins),
                           color: Colors.green.shade300,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(child: PlayerWidget(player: players[1])),
+                                  ],
+                                )
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Row(
+                                  children: [
+                                    Expanded(child: PlayerWidget(player: players[0])),
+                                    Expanded(child: PlayerWidget(player: players[2])),
+                                  ],
+                                )
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Expanded(child: PlayerWidget(player: players[3])),
+                                  ],
+                                )
+                              ),
+                            ],
+                          ),
                         ),
-                        _boardCenter(),
+                        boardCenter(),
                       ],
                     ),
                   ),
-                  Expanded(flex: 1, child: _rightPlayerArea()),
+                  Expanded(flex: 1, child: rightPlayerArea()),
                 ],
               ),
             ),
@@ -358,15 +390,15 @@ class _BoardWidgetState extends State<BoardWidget> {
               flex: 1,
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: _leftPlayerSlot()),
+                  Expanded(flex: 1, child: leftPlayerSlot()),
                   Expanded(
                     flex: 2,
                     child: Container(
                       alignment: Alignment.center,
-                      child: _bottomPlayerArea()
+                      child: bottomPlayerArea()
                     ),
                   ),
-                  Expanded(flex: 1, child: _bottomPlayerSlot()),
+                  Expanded(flex: 1, child: bottomPlayerSlot()),
                 ],
               ),
             ),

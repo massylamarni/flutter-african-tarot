@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tarot_africain/models/player.dart';
-import 'package:tarot_africain/models/card.dart' as cardModel;
+import 'package:tarot_africain/models/card.dart' as card_model;
 
 class CardWidget extends StatelessWidget {
   final Player player;
-  final cardModel.Card? card;
+  final card_model.Card? card;
   final VoidCallback? onTap;
   final double? cardWidth;
   final double? cardHeight;
@@ -22,7 +22,7 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardModel.Card playerCard = card ?? player.deck.peek();
+    final card_model.Card playerCard = card ?? player.deck.peek();
 
     Widget cardWidget = Image.asset(
       playerCard.assetPath,
